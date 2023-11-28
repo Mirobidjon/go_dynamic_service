@@ -6,5 +6,5 @@ vendor
 hello.pdf
 barcodetest.go
 a.json
-# main.go
+main.go
 *.json
