@@ -1,0 +1,71 @@
+syntax="proto3";
+
+package dynamic_service;
+option go_package="genproto/dynamic_service";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+
+service EntityService {
+    rpc Create(Entity) returns (Entity) {}
+    rpc Update(Entity) returns (Entity) {}
+    rpc UpdatePatch(Entity) returns (Entity) {}
+    rpc Delete(Entity) returns (google.protobuf.Empty) {}
+    rpc GetAll(GetAllRequest) returns (GetAllResponse) {}
+    rpc GetById(GetByPk) returns (Entity) {}
+    rpc GetJoin(GetJoinRequest) returns (GetAllResponse) {}
+}
+
+message Entity {
+    string _id = 1;
+    string slug = 2;
+    google.protobuf.Struct data = 3;
+    string location = 4;
+}
+
+message GetAllResponse {
+    string slug = 1;
+    repeated google.protobuf.Struct entities = 2;
+    int32 count = 3;
+}
+
+message GetByPk {
+    string _id = 1;
+    string slug = 2;
+    string location = 3;
+}
+
+message GetAllRequest {
+    string slug = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+    string sort = 4;
+    string order = 5;
+    string search = 6;
+    google.protobuf.Struct data = 7;
+    string location = 8;
+}
+
+message GetBySlug {
+    string slug = 1;
+    string location = 2;
+}
+
+message LookUps {
+    string from = 1;
+    string localField = 2;
+    string foreignField = 3;
+    string as = 4;
+}
+
+message GetJoinRequest {
+    string slug = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+    string sort = 4;
+    string order = 5;
+    string search = 6;
+    google.protobuf.Struct data = 7;
+    string location = 8;
+    repeated LookUps lookups = 9;
+}

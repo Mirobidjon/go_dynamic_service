@@ -1,0 +1,43 @@
+before_script:
+  - echo $CI_REGISTRY_PASSWORD | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+
+stages:
+  - build
+  - migrate
+  - deploy
+
+build_image_test:
+  stage: build
+  script:
+    - make build-image TAG=$CI_PIPELINE_IID SERVICE_NAME=$CI_PROJECT_NAME PROJECT_NAME=$CI_PROJECT_NAMESPACE REGISTRY=$CI_REGISTRY ENV_TAG=test
+  only:
+    - master
+
+deploy_image_test:
+  stage: deploy
+  script:
+    - docker service update --with-registry-auth --image $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_PIPELINE_IID kassa_${CI_PROJECT_NAME}
+  only:
+    - master
+
+build_image_prod:
+  stage: build
+  before_script:
+    - echo $REGISTRY_PASSWORD | docker login $REGISTRY -u $REGISTRY_USER --password-stdin
+  script:
+    - make build-image TAG=$CI_PIPELINE_IID SERVICE_NAME=$CI_PROJECT_NAME PROJECT_NAME=$CI_PROJECT_NAMESPACE REGISTRY=$REGISTRY ENV_TAG=latest
+    - make push-image TAG=$CI_PIPELINE_IID SERVICE_NAME=$CI_PROJECT_NAME PROJECT_NAME=$CI_PROJECT_NAMESPACE REGISTRY=$REGISTRY ENV_TAG=latest
+  only:
+    - production
+
+deploy_image_prod:
+  before_script:
+    - export KUBECONFIG=~/.kube/config
+  stage: deploy
+  script:
+    - kubectl set image deployment/dynamic-service dynamic-service=$REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_PIPELINE_IID -n kassa360
+  only:
+    - production
+  tags:
+    - prod
+  when: manual

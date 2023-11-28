@@ -1,0 +1,1394 @@
+definitions:
+  dynamic_service.Field:
+    properties:
+      _id:
+        type: string
+      created_at:
+        type: string
+      default_value:
+        type: string
+      description:
+        type: string
+      field_type:
+        type: string
+      group_id:
+        type: string
+      is_required:
+        type: boolean
+      is_searchable:
+        type: integer
+      max:
+        type: integer
+      min:
+        type: integer
+      name:
+        type: string
+      order_number:
+        type: integer
+      placeholder:
+        type: string
+      select_type:
+        items:
+          $ref: '#/definitions/dynamic_service.SelectType'
+        type: array
+      slug:
+        type: string
+      status:
+        type: integer
+      updated_at:
+        type: string
+      validation_func:
+        type: string
+      validation_regex:
+        type: string
+    type: object
+  dynamic_service.GetAllFieldResponse:
+    properties:
+      count:
+        type: integer
+      fields:
+        items:
+          $ref: '#/definitions/dynamic_service.Field'
+        type: array
+    type: object
+  dynamic_service.SelectType:
+    properties:
+      _id:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      value:
+        type: string
+    type: object
+  http.Response:
+    properties:
+      data: {}
+      description:
+        type: string
+      error: {}
+      message:
+        type: string
+      requestId:
+        type: string
+      status:
+        type: string
+    type: object
+  kassa360_kassa360_go_dynamic_service_api_models.Group:
+    properties:
+      description:
+        type: string
+      group_type:
+        type: integer
+      name:
+        type: string
+      order_number:
+        type: integer
+      parent_id:
+        type: string
+      slug:
+        type: string
+      status:
+        type: integer
+    type: object
+  models.Configuration:
+    properties:
+      description:
+        type: string
+      field_type:
+        type: string
+      filter:
+        type: string
+      name:
+        type: string
+      value:
+        type: string
+    type: object
+  models.Entity:
+    properties:
+      _id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+      status:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.GetAllGroupResponse:
+    properties:
+      count:
+        type: integer
+      groups:
+        items:
+          $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+        type: array
+    type: object
+  models.JoinGroupRequest:
+    properties:
+      _id:
+        type: string
+      from_date:
+        type: string
+      lookups:
+        items:
+          $ref: '#/definitions/models.Lookup'
+        type: array
+      name:
+        type: string
+      to_date:
+        type: string
+    type: object
+  models.Lookup:
+    properties:
+      as:
+        type: string
+      foreignField:
+        type: string
+      from:
+        type: string
+      localField:
+        type: string
+    type: object
+  models.SignInRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.SignInResponse:
+    properties:
+      access_token:
+        type: string
+      expired_at:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a api gateway
+  termsOfService: https://kassa360.uz
+paths:
+  /client-api/auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Sign In
+      operationId: sign_in
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Sign In
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.SignInResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Sign In
+      tags:
+      - Auth
+  /client-api/configuration/default_values:
+    get:
+      consumes:
+      - application/json
+      description: Default Values Configuration
+      operationId: default_values_configuration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Configuration'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Default Values Configuration
+      tags:
+      - Configuration
+  /client-api/configuration/field_types:
+    get:
+      consumes:
+      - application/json
+      description: Field Type Configuration
+      operationId: field_type_configuration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Configuration'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      - ApiKeyAuth: []
+      summary: Field Type Configuration
+      tags:
+      - Configuration
+  /client-api/configuration/group_types:
+    get:
+      consumes:
+      - application/json
+      description: Group Type Configuration
+      operationId: group_type_configuration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Configuration'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Group Type Configuration
+      tags:
+      - Configuration
+  /client-api/configuration/regex:
+    get:
+      consumes:
+      - application/json
+      description: Regex Configuration
+      operationId: regex_configuration
+      parameters:
+      - description: Regex
+        in: query
+        name: regex
+        required: true
+        type: string
+      - description: Value
+        in: query
+        name: value
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Configuration'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Regex Configuration
+      tags:
+      - Configuration
+  /client-api/configuration/validation_functions:
+    get:
+      consumes:
+      - application/json
+      description: Validation Function Configuration
+      operationId: validation_function_configuration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Configuration'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Validation Function Configuration
+      tags:
+      - Configuration
+  /client-api/dynamic/field:
+    get:
+      consumes:
+      - application/json
+      description: Get All Field
+      operationId: get_all_field
+      parameters:
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        in: query
+        name: order
+        type: string
+      - description: Group ID
+        in: query
+        name: group_id
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Slug
+        in: query
+        name: slug
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dynamic_service.GetAllFieldResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Field
+      tags:
+      - Field
+    post:
+      consumes:
+      - application/json
+      description: Create Field
+      operationId: create_field
+      parameters:
+      - description: Create Field
+        in: body
+        name: field
+        required: true
+        schema:
+          $ref: '#/definitions/dynamic_service.Field'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dynamic_service.Field'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Field
+      tags:
+      - Field
+  /client-api/dynamic/field/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Field
+      operationId: delete_field
+      parameters:
+      - description: Field ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Field
+      tags:
+      - Field
+    get:
+      consumes:
+      - application/json
+      description: Get Field By ID
+      operationId: get_field_by_id
+      parameters:
+      - description: Field ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dynamic_service.Field'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Field By ID
+      tags:
+      - Field
+    put:
+      consumes:
+      - application/json
+      description: Update Field
+      operationId: update_field
+      parameters:
+      - description: Field ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Field
+        in: body
+        name: field
+        required: true
+        schema:
+          $ref: '#/definitions/dynamic_service.Field'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dynamic_service.Field'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Field
+      tags:
+      - Field
+  /client-api/dynamic/group:
+    get:
+      consumes:
+      - application/json
+      description: Get All Group
+      operationId: get_all_group
+      parameters:
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        in: query
+        name: order
+        type: string
+      - description: Group Type
+        in: query
+        name: group_type
+        type: integer
+      - description: Slug
+        in: query
+        name: slug
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Parent ID
+        in: query
+        name: parent_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.GetAllGroupResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Group
+      tags:
+      - Group
+    post:
+      consumes:
+      - application/json
+      description: Create Group
+      operationId: create_group
+      parameters:
+      - description: Create Group
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Group
+      tags:
+      - Group
+  /client-api/dynamic/group/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Group
+      operationId: delete_group
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Group
+      tags:
+      - Group
+    get:
+      consumes:
+      - application/json
+      description: Get Group
+      operationId: get_group
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Group
+      tags:
+      - Group
+    put:
+      consumes:
+      - application/json
+      description: Update Group
+      operationId: update_group
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Group
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Group
+      tags:
+      - Group
+  /client-api/dynamic/group/{slug}/full:
+    get:
+      consumes:
+      - application/json
+      description: Get Full Group
+      operationId: get_full_group
+      parameters:
+      - description: Group Slug Or ID
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Full Group
+      tags:
+      - Group
+  /client-api/entity/{slug}/create:
+    post:
+      consumes:
+      - application/json
+      description: Create Entity
+      operationId: create_entity
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Create Entity
+        in: body
+        name: entity
+        required: true
+        schema:
+          $ref: '#/definitions/models.Entity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Entity
+      tags:
+      - Entity
+  /client-api/entity/{slug}/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Entity
+      operationId: delete_entity
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Deleted
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Entity
+      tags:
+      - Entity
+  /client-api/entity/{slug}/get-all:
+    post:
+      consumes:
+      - application/json
+      description: Get All Entities
+      operationId: get_all
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        in: query
+        name: order
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Filter Entity
+        in: body
+        name: filter
+        schema:
+          $ref: '#/definitions/models.Entity'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Entities
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Entities
+      tags:
+      - Entity
+  /client-api/entity/{slug}/get-join:
+    post:
+      consumes:
+      - application/json
+      description: Get Join Entities
+      operationId: get_join
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        in: query
+        name: order
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Filter Entity
+        in: body
+        name: filter
+        schema:
+          $ref: '#/definitions/models.JoinGroupRequest'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Get Join Entities
+      tags:
+      - Entity
+  /client-api/entity/{slug}/get/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Entity
+      operationId: get_entity
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Entity
+      tags:
+      - Entity
+  /client-api/entity/{slug}/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update Entity
+      operationId: update_entity
+      parameters:
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Entity
+        in: body
+        name: entity
+        required: true
+        schema:
+          $ref: '#/definitions/models.Entity'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Entity
+      tags:
+      - Entity
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
+swagger: "2.0"

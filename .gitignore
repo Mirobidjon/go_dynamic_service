@@ -1,0 +1,10 @@
+.env
+vendor
+.idea/
+.DS_Store
+.vscode
+hello.pdf
+barcodetest.go
+a.json
+# main.go
+*.json
