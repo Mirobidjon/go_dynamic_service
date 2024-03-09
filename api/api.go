@@ -113,14 +113,5 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 		configuration.Get("/regex", h.RegexConfiguration)
 	}
 
-	conf := r.Group("/client-api/conf")
-	{
-		conf.Get("/field_types", h.FieldTypeConfiguration)
-		conf.Get("/default_values", h.DefaultValuesConfiguration)
-		conf.Get("/group_types", h.GroupTypeConfiguration)
-		conf.Get("/validation_functions", h.ValidationFunctionConfiguration)
-		conf.Get("/regex", h.RegexConfiguration)
-	}
-
 	return r
 }
