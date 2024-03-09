@@ -276,7 +276,7 @@ func (r *groupRepo) DeleteField(ctx context.Context, req *pd.GetByIdRequest) err
 		ids = append(ids, id)
 	}
 
-	_, err := collection.DeleteOne(ctx, bson.M{"_id": bson.M{"$in": ids}})
+	_, err := collection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
 
 	r.cache.DeleteAll()
 

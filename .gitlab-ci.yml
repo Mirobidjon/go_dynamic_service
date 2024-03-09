@@ -3,7 +3,6 @@ before_script:
 
 stages:
   - build
-  - migrate
   - deploy
 
 build_image_test:

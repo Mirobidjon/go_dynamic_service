@@ -55,8 +55,8 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 	r.Server().LogAllErrors = true
 
 	r.Use(limiter.New(limiter.Config{
-		Max:        5,
-		Expiration: 1 * time.Second,
+		Max:        150,
+		Expiration: 10 * time.Second,
 		KeyGenerator: func(c *fiber.Ctx) string {
 			return c.IP()
 		},
@@ -79,9 +79,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 
 	r.Post("/client-api/auth/sign-in", h.SignIn)
 
-	r.Use(h.HasAccessMiddleware)
-
-	dynamic := r.Group("/client-api/dynamic")
+	dynamic := r.Group("/client-api/dynamic", h.HasAccessMiddleware)
 	{
 		dynamic.Post("/group", h.CreateGroup)
 		dynamic.Get("/group", h.GetAllGroup)
@@ -96,7 +94,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 		dynamic.Get("/group/:slug/full", h.GetFullGroup)
 	}
 
-	entity := r.Group("/client-api/entity")
+	entity := r.Group("/client-api/entity", h.HasAccessMiddleware)
 	{
 		entity.Post("/:slug/create", h.CreateEntity)
 		entity.Put("/:slug/update/:id", h.UpdateEntity)
@@ -106,13 +104,22 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 		entity.Post("/:slug/get-join", h.GetJoinEntity)
 	}
 
-	configuration := r.Group("/client-api/configuration")
+	configuration := r.Group("/client-api/configuration", h.HasAccessMiddleware)
 	{
 		configuration.Get("/field_types", h.FieldTypeConfiguration)
 		configuration.Get("/default_values", h.DefaultValuesConfiguration)
 		configuration.Get("/group_types", h.GroupTypeConfiguration)
 		configuration.Get("/validation_functions", h.ValidationFunctionConfiguration)
 		configuration.Get("/regex", h.RegexConfiguration)
+	}
+
+	conf := r.Group("/client-api/conf")
+	{
+		conf.Get("/field_types", h.FieldTypeConfiguration)
+		conf.Get("/default_values", h.DefaultValuesConfiguration)
+		conf.Get("/group_types", h.GroupTypeConfiguration)
+		conf.Get("/validation_functions", h.ValidationFunctionConfiguration)
+		conf.Get("/regex", h.RegexConfiguration)
 	}
 
 	return r
