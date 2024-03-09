@@ -14,7 +14,7 @@ update-proto-module:
 
 copy-proto-module:
 	rm -rf ${CURRENT_DIR}/protos
-	rsync -rv --exclude={'/.git','LICENSE','README.md'} ${CURRENT_DIR}/kassa360_protos/* ${CURRENT_DIR}/protos
+	rsync -rv --exclude={'/.git','LICENSE','README.md'} ${CURRENT_DIR}/mirobidjon_protos/* ${CURRENT_DIR}/protos
 
 gen-proto-module:
 	./scripts/gen_proto.sh ${CURRENT_DIR}

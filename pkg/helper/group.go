@@ -2,9 +2,10 @@ package helper
 
 import (
 	"fmt"
-	pb "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
-	"kassa360/kassa360_go_dynamic_service/models"
 	"reflect"
+
+	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/models"
 
 	"github.com/spf13/cast"
 	"go.mongodb.org/mongo-driver/bson/primitive"

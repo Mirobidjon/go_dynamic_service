@@ -1,8 +1,8 @@
 package client
 
 import (
-	"kassa360/kassa360_go_dynamic_service/config"
-	pd "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/config"
+	pd "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

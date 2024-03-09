@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"kassa360/kassa360_go_dynamic_service/api"
-	"kassa360/kassa360_go_dynamic_service/config"
-	"kassa360/kassa360_go_dynamic_service/grpc"
-	"kassa360/kassa360_go_dynamic_service/storage"
-	"kassa360/kassa360_go_dynamic_service/storage/mongodb"
+
+	"github.com/mirobidjon/go_dynamic_service/api"
+	"github.com/mirobidjon/go_dynamic_service/config"
+	"github.com/mirobidjon/go_dynamic_service/grpc"
+	"github.com/mirobidjon/go_dynamic_service/storage"
+	"github.com/mirobidjon/go_dynamic_service/storage/mongodb"
 
 	"github.com/saidamir98/udevs_pkg/logger"
 	"golang.org/x/sync/errgroup"

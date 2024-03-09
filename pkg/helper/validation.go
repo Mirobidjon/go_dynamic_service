@@ -2,12 +2,13 @@ package helper
 
 import (
 	"fmt"
-	"kassa360/kassa360_go_dynamic_service/config"
-	pb "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
-	"kassa360/kassa360_go_dynamic_service/models"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/mirobidjon/go_dynamic_service/config"
+	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/models"
 
 	"github.com/google/uuid"
 	"github.com/spf13/cast"

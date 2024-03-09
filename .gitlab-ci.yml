@@ -35,7 +35,7 @@ deploy_image_prod:
     - export KUBECONFIG=~/.kube/config
   stage: deploy
   script:
-    - kubectl set image deployment/dynamic-service dynamic-service=$REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_PIPELINE_IID -n kassa360
+    - kubectl set image deployment/dynamic-service dynamic-service=$REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_PIPELINE_IID -n mirobidjon
   only:
     - production
   tags:

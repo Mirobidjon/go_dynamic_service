@@ -2,7 +2,8 @@ package storage
 
 import (
 	"context"
-	pd "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
+
+	pd "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
 
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/saidamir98/udevs_pkg/logger"

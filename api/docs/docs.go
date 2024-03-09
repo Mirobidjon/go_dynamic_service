@@ -9,7 +9,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "https://kassa360.uz",
+        "termsOfService": "https://mirobidjon.uz",
         "contact": {},
         "version": "{{.Version}}"
     },
@@ -1146,7 +1146,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group"
+                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
                         }
                     }
                 ],
@@ -1162,7 +1162,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group"
+                                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
                                         }
                                     }
                                 }
@@ -1248,7 +1248,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group"
+                                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
                                         }
                                     }
                                 }
@@ -1325,7 +1325,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group"
+                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
                         }
                     }
                 ],
@@ -1499,7 +1499,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group"
+                                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
                                         }
                                     }
                                 }
@@ -2273,7 +2273,7 @@ const docTemplate = `{
                 }
             }
         },
-        "kassa360_kassa360_go_dynamic_service_api_models.Group": {
+        "mirobidjon_go_dynamic_service_api_models.Group": {
             "type": "object",
             "properties": {
                 "description": {
@@ -2354,7 +2354,7 @@ const docTemplate = `{
                 "groups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group"
+                        "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
                     }
                 }
             }

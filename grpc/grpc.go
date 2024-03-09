@@ -3,13 +3,14 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"kassa360/kassa360_go_dynamic_service/config"
-	pb "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
-	"kassa360/kassa360_go_dynamic_service/pkg/helper"
-	"kassa360/kassa360_go_dynamic_service/service"
-	"kassa360/kassa360_go_dynamic_service/storage"
 	"net"
 	"runtime"
+
+	"github.com/mirobidjon/go_dynamic_service/config"
+	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
+	"github.com/mirobidjon/go_dynamic_service/service"
+	"github.com/mirobidjon/go_dynamic_service/storage"
 
 	"github.com/saidamir98/udevs_pkg/logger"
 
@@ -19,7 +20,7 @@ import (
 
 func StartGRPCServer(cfg config.Config, log logger.LoggerI, strg storage.StorageI) error {
 	grpcServer := SetUpServer(cfg, log, strg)
-	
+
 	lis, err := net.Listen("tcp", cfg.RPCPort)
 	if err != nil {
 		log.Error("error while listen RPC", logger.Error(err))

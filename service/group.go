@@ -2,12 +2,13 @@ package service
 
 import (
 	"context"
-	"kassa360/kassa360_go_dynamic_service/config"
-	"kassa360/kassa360_go_dynamic_service/models"
-	"kassa360/kassa360_go_dynamic_service/pkg/helper"
-	"kassa360/kassa360_go_dynamic_service/storage"
 
-	pb "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/config"
+	"github.com/mirobidjon/go_dynamic_service/models"
+	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
+	"github.com/mirobidjon/go_dynamic_service/storage"
+
+	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
 
 	log "github.com/saidamir98/udevs_pkg/logger"
 	"google.golang.org/grpc/codes"

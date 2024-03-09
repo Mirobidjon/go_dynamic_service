@@ -48,11 +48,6 @@ type Config struct {
 	DynamicServiceHost string
 	DynamicGRPCPort    string
 
-	SoliqEndpoint string
-	SoliqUsername string
-	SoliqPassword string
-	DsvServerUrl  string
-
 	MinioEndpoint    string
 	MinioHost        string
 	MinioAccessKeyID string
@@ -60,21 +55,10 @@ type Config struct {
 	MinioImageHost   string
 	RPCPort          string
 
-	KafkaUrlBroker1 string
-	KafkaUrlBroker2 string
-	KafkaUrlBroker3 string
-
 	SecretKey string
 
 	PasscodePool   string
 	PasscodeLength int
-
-	RoumingHost          string
-	TestRoumingHost      string
-	NewSoliqServis       string
-	ForPdfNewSoliqServis string
-
-	NewSoliqServisLink string
 
 	DefaultOffset string
 	DefaultLimit  string
@@ -128,34 +112,17 @@ func Load() Config {
 	config.DynamicServiceHost = cast.ToString(getOrReturnDefaultValue("DYNAMIC_SERVICE_HOST", "localhost"))
 	config.DynamicGRPCPort = cast.ToString(getOrReturnDefaultValue("DYNAMIC_GRPC_PORT", ":9103"))
 
-	config.MinioEndpoint = cast.ToString(getOrReturnDefaultValue("MINIO_ENDPOINT_LOCAL", "172.26.10.15:9000"))
-	config.MinioHost = cast.ToString(getOrReturnDefaultValue("MINIO_HOST", "https://v3.soliqservis.uz:3443"))
-	config.MinioImageHost = cast.ToString(getOrReturnDefaultValue("MINIO_IMAGE_HOST", "http://172.26.10.15:9000"))
-	config.MinioAccessKeyID = cast.ToString(getOrReturnDefaultValue("MINIO_ACCESS_KEY_ID", ""))
-	config.MinioSecretKey = cast.ToString(getOrReturnDefaultValue("MINIO_SECRET_KEY", ""))
-
-	config.KafkaUrlBroker1 = cast.ToString(getOrReturnDefaultValue("KAFKA_BROKER_1", "172.26.10.12:9092"))
-	config.KafkaUrlBroker2 = cast.ToString(getOrReturnDefaultValue("KAFKA_BROKER_2", "172.26.10.12:9092"))
-	config.KafkaUrlBroker3 = cast.ToString(getOrReturnDefaultValue("KAFKA_BROKER_3", "172.26.10.12:9092"))
-
-	config.RoumingHost = cast.ToString(getOrReturnDefaultValue("ROUMING_HOST", "https://s0.rouming.uz/viewer"))
-
-	config.NewSoliqServis = cast.ToString(getOrReturnDefaultValue("NEW_SOLIQ_SERVIS", "https://new.soliqservis.uz/api/download"))
-	config.ForPdfNewSoliqServis = cast.ToString(getOrReturnDefaultValue("NEW_SOLIQ_SERVIS", "http://new-api.soliqservis.local/download"))
-
-	config.NewSoliqServisLink = cast.ToString(getOrReturnDefaultValue("NEW_SOLIQ_SERVIS", "https://new.soliqservis.uz"))
-
 	config.DefaultOffset = cast.ToString(getOrReturnDefaultValue("DEFAULT_OFFSET", "0"))
 	config.DefaultLimit = cast.ToString(getOrReturnDefaultValue("DEFAULT_LIMIT", "10"))
 
 	config.TGBotToken = cast.ToString(getOrReturnDefaultValue("TG_BOT_TOKEN", ""))
 	config.TGChatId = cast.ToInt64(getOrReturnDefaultValue("TG_CHAT_ID", "-1001514410398"))
 
-	config.CacheTTL = cast.ToInt64(getOrReturnDefaultValue("CACHE_TTL", 1))
+	config.CacheTTL = cast.ToInt64(getOrReturnDefaultValue("CACHE_TTL", 10))
 
 	config.Username = cast.ToString(getOrReturnDefaultValue("USERNAME", ""))
 	config.Password = cast.ToString(getOrReturnDefaultValue("PASSWORD", ""))
-	config.SignInKey = cast.ToString(getOrReturnDefaultValue("SIGN_IN_KEY", "client-api-auth"))
+	config.SignInKey = cast.ToString(getOrReturnDefaultValue("SIGN_IN_KEY", ""))
 
 	return config
 }

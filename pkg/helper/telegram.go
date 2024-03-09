@@ -2,8 +2,9 @@ package helper
 
 import (
 	"fmt"
-	"kassa360/kassa360_go_dynamic_service/config"
 	"strings"
+
+	"github.com/mirobidjon/go_dynamic_service/config"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )

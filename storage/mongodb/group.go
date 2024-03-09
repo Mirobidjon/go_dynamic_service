@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	pd "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
-	"kassa360/kassa360_go_dynamic_service/pkg/helper"
-	"kassa360/kassa360_go_dynamic_service/storage"
 	"strings"
+
+	pd "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
+	"github.com/mirobidjon/go_dynamic_service/storage"
 
 	"github.com/jellydator/ttlcache/v3"
 	"go.mongodb.org/mongo-driver/bson"

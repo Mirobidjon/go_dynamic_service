@@ -2,11 +2,12 @@ package api
 
 import (
 	"encoding/json"
-	_ "kassa360/kassa360_go_dynamic_service/api/docs"
-	"kassa360/kassa360_go_dynamic_service/api/handlers"
-	"kassa360/kassa360_go_dynamic_service/config"
-	"kassa360/kassa360_go_dynamic_service/grpc/client"
 	"time"
+
+	_ "github.com/mirobidjon/go_dynamic_service/api/docs"
+	"github.com/mirobidjon/go_dynamic_service/api/handlers"
+	"github.com/mirobidjon/go_dynamic_service/config"
+	"github.com/mirobidjon/go_dynamic_service/grpc/client"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	fiber "github.com/gofiber/fiber/v2"
@@ -43,7 +44,7 @@ func StartHTTPServer(cfg config.Config, log logger.LoggerI) error {
 // @name Authorization
 // SetUpRouter godoc
 // @description This is a api gateway
-// @termsOfService https://kassa360.uz
+// @termsOfService https://mirobidjon.uz
 func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 	r := fiber.New(fiber.Config{JSONEncoder: json.Marshal, BodyLimit: 100 * 1024 * 1024})
 	r.Use(fiberLogger.New(), cors.New())

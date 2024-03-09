@@ -3,9 +3,10 @@ package mongodb
 import (
 	"context"
 	"fmt"
-	"kassa360/kassa360_go_dynamic_service/config"
-	"kassa360/kassa360_go_dynamic_service/storage"
 	"time"
+
+	"github.com/mirobidjon/go_dynamic_service/config"
+	"github.com/mirobidjon/go_dynamic_service/storage"
 
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/saidamir98/udevs_pkg/logger"

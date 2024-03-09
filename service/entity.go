@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
-	"kassa360/kassa360_go_dynamic_service/config"
-	pb "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
-	"kassa360/kassa360_go_dynamic_service/pkg/helper"
-	"kassa360/kassa360_go_dynamic_service/storage"
+
+	"github.com/mirobidjon/go_dynamic_service/config"
+	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
+	"github.com/mirobidjon/go_dynamic_service/storage"
 
 	log "github.com/saidamir98/udevs_pkg/logger"
 	"github.com/spf13/cast"

@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"kassa360/kassa360_go_dynamic_service/api/http"
-	"kassa360/kassa360_go_dynamic_service/config"
-	"kassa360/kassa360_go_dynamic_service/grpc/client"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mirobidjon/go_dynamic_service/api/http"
+	"github.com/mirobidjon/go_dynamic_service/config"
+	"github.com/mirobidjon/go_dynamic_service/grpc/client"
 
 	"github.com/google/uuid"
 	"github.com/jellydator/ttlcache/v3"

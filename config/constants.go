@@ -1,8 +1,9 @@
 package config
 
 import (
-	"kassa360/kassa360_go_dynamic_service/api/models"
 	"time"
+
+	"github.com/mirobidjon/go_dynamic_service/api/models"
 )
 
 const (

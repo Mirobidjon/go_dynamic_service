@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"kassa360/kassa360_go_dynamic_service/api/http"
-	"kassa360/kassa360_go_dynamic_service/api/models"
-	"kassa360/kassa360_go_dynamic_service/config"
-	"kassa360/kassa360_go_dynamic_service/pkg/helper"
 	"strings"
 	"time"
+
+	"github.com/mirobidjon/go_dynamic_service/api/http"
+	"github.com/mirobidjon/go_dynamic_service/api/models"
+	"github.com/mirobidjon/go_dynamic_service/config"
+	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
 
 	fiber "github.com/gofiber/fiber/v2"
 )

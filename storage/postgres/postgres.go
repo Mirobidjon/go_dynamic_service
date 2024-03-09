@@ -3,8 +3,9 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"kassa360/kassa360_go_dynamic_service/config"
-	"kassa360/kassa360_go_dynamic_service/storage"
+
+	"github.com/mirobidjon/go_dynamic_service/config"
+	"github.com/mirobidjon/go_dynamic_service/storage"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )

@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"kassa360/kassa360_go_dynamic_service/api/http"
-	"kassa360/kassa360_go_dynamic_service/config"
 	"regexp"
+
+	"github.com/mirobidjon/go_dynamic_service/api/http"
+	"github.com/mirobidjon/go_dynamic_service/config"
 
 	fiber "github.com/gofiber/fiber/v2"
 )

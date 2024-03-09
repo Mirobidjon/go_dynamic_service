@@ -75,7 +75,7 @@ definitions:
       status:
         type: string
     type: object
-  kassa360_kassa360_go_dynamic_service_api_models.Group:
+  mirobidjon_go_dynamic_service_api_models.Group:
     properties:
       description:
         type: string
@@ -128,7 +128,7 @@ definitions:
         type: integer
       groups:
         items:
-          $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+          $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
         type: array
     type: object
   models.JoinGroupRequest:
@@ -177,7 +177,7 @@ definitions:
 info:
   contact: {}
   description: This is a api gateway
-  termsOfService: https://kassa360.uz
+  termsOfService: https://mirobidjon.uz
 paths:
   /client-api/auth/sign-in:
     post:
@@ -804,7 +804,7 @@ paths:
         name: group
         required: true
         schema:
-          $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+          $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
       produces:
       - application/json
       responses:
@@ -815,7 +815,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+                  $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
               type: object
         "400":
           description: Bad Request
@@ -903,7 +903,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+                  $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
               type: object
         "400":
           description: Bad Request
@@ -944,7 +944,7 @@ paths:
         name: group
         required: true
         schema:
-          $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+          $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
       produces:
       - application/json
       responses:
@@ -1002,7 +1002,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/kassa360_kassa360_go_dynamic_service_api_models.Group'
+                  $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
               type: object
         "400":
           description: Bad Request

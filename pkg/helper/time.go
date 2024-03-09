@@ -1,8 +1,9 @@
 package helper
 
 import (
-	"kassa360/kassa360_go_dynamic_service/config"
 	"time"
+
+	"github.com/mirobidjon/go_dynamic_service/config"
 )
 
 func TimeNow() string {

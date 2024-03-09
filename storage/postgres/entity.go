@@ -2,8 +2,9 @@ package postgres
 
 import (
 	"context"
-	pd "kassa360/kassa360_go_dynamic_service/genproto/dynamic_service"
-	"kassa360/kassa360_go_dynamic_service/storage"
+
+	pd "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/storage"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
