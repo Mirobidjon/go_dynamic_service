@@ -93,3 +93,18 @@ func ToProtoStruct(body interface{}) (entity *structpb.Struct, err error) {
 	err = entity.UnmarshalJSON(js)
 	return
 }
+
+func StringToStructPb(js string) (entity *structpb.Struct, err error) {
+	entity = &structpb.Struct{}
+	err = entity.UnmarshalJSON([]byte(js))
+	return
+}
+
+func StructPbToString(entity *structpb.Struct) (string, error) {
+	js, err := entity.MarshalJSON()
+	if err != nil {
+		return "", err
+	}
+
+	return string(js), nil
+}
