@@ -82,7 +82,7 @@ func Load() Config {
 
 	config := Config{}
 
-	config.ServiceName = cast.ToString(getOrReturnDefaultValue("SERVICE_NAME", "ss_go_dynamic_service"))
+	config.ServiceName = cast.ToString(getOrReturnDefaultValue("SERVICE_NAME", "go_dynamic_service"))
 	config.Environment = cast.ToString(getOrReturnDefaultValue("ENVIRONMENT", DebugMode))
 	config.Version = cast.ToString(getOrReturnDefaultValue("VERSION", "1.0"))
 
@@ -94,9 +94,9 @@ func Load() Config {
 	config.MongoHost1 = cast.ToString(getOrReturnDefaultValue("MONGO_HOST", "172.26.10.13"))
 	config.MongoHost2 = cast.ToString(getOrReturnDefaultValue("MONGO_HOST2", "172.26.10.13"))
 	config.MongoPort = cast.ToInt(getOrReturnDefaultValue("MONGO_PORT", 27017))
-	config.MongoUser = cast.ToString(getOrReturnDefaultValue("MONGO_USER", "ss_go_dynamic_service"))
+	config.MongoUser = cast.ToString(getOrReturnDefaultValue("MONGO_USER", "go_dynamic_service"))
 	config.MongoPassword = cast.ToString(getOrReturnDefaultValue("MONGO_PASSWORD", ""))
-	config.MongoDatabase = cast.ToString(getOrReturnDefaultValue("MONGO_DATABASE", "ss_go_dynamic_service"))
+	config.MongoDatabase = cast.ToString(getOrReturnDefaultValue("MONGO_DATABASE", "go_dynamic_service"))
 
 	config.PostgresHost = cast.ToString(getOrReturnDefaultValue("POSTGRES_HOST", ""))
 	config.PostgresPort = cast.ToInt(getOrReturnDefaultValue("POSTGRES_PORT", 5432))
