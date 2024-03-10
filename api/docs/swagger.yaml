@@ -1398,6 +1398,63 @@ paths:
       tags:
       - Entity
   /client-api/entity/{slug}/update/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Patch Update Entity
+      operationId: update_entity
+      parameters:
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Entity
+        in: body
+        name: entity
+        required: true
+        schema:
+          $ref: '#/definitions/models.Entity'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Patch Update Entity
+      tags:
+      - Entity
     put:
       consumes:
       - application/json
