@@ -1143,11 +1143,82 @@ paths:
       tags:
       - Entity
   /client-api/entity/{slug}/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get All Entities
+      operationId: get_all_get
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        in: query
+        name: order
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Entities
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Entities
+      tags:
+      - Entity
     post:
       consumes:
       - application/json
       description: Get All Entities
-      operationId: get_all
+      operationId: get_all_post
       parameters:
       - default: '"Asia/Tashkent"'
         description: Location
@@ -1385,7 +1456,7 @@ paths:
       tags:
       - Entity
   /client-api/service/{slug}/get-all:
-    post:
+    get:
       consumes:
       - application/json
       description: Get All Services

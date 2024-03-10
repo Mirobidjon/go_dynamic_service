@@ -55,7 +55,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 
 	open := r.Group("/client-api/service", h.Limiter(10, 5))
 	{
-		open.Post("/:slug/get-all", h.GetAllServices)
+		open.Get("/:slug/get-all", h.GetAllServices)
 	}
 
 	r.Use(h.Limiter(300, 10))
@@ -90,9 +90,11 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 	{
 		entity.Post("/:slug/create", h.CreateEntity)
 		entity.Put("/:slug/update/:id", h.UpdateEntity)
+		entity.Patch("/:slug/update/:id", h.PatchUpdateEntity)
 		entity.Delete("/:slug/delete/:id", h.DeleteEntity)
 		entity.Get("/:slug/get/:id", h.GetEntity)
-		entity.Post("/:slug/get-all", h.GetAllEntity)
+		entity.Post("/:slug/get-all", h.GetAllEntityPost)
+		entity.Get("/:slug/get-all", h.GetAllEntityGet)
 		entity.Post("/:slug/get-join", h.GetJoinEntity)
 	}
 
