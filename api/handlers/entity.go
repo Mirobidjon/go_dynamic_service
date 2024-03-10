@@ -313,3 +313,87 @@ func (h *Handler) GetJoinEntity(c *fiber.Ctx) error {
 
 	return h.handleResponse(c, http.OK, response, "join_entity", "")
 }
+
+// GetAllService godoc
+// @Security ApiKeyAuth
+// @ID get_all_service
+// @Router /client-api/service/{slug}/get-all [POST]
+// @Param location header string false "Location" default("Asia/Tashkent")
+// @Summary Get All Services
+// @Description Get All Services
+// @Accept json
+// @Produce json
+// @Tags Entity
+// @Param slug path string true "Entity Slug"
+// @Param offset query int false "Offset"
+// @Param limit query int false "Limit"
+// @Param sort query string false "Sort"
+// @Param order query string false "Order"
+// @Param search query string false "Search"
+// @Param filter body models.Entity false "Filter Entity"
+// @Success 200 {object} http.Response{data=models.Entity} "Services"
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetAllServices(c *fiber.Ctx) error {
+	slug := c.Params("slug")
+	if slug == "" {
+		return h.handleResponse(c, http.BadRequest, nil, "invalid_slug", "slug is required")
+	}
+
+	offset, err := h.getOffsetParam(c)
+	if err != nil {
+		return h.handleResponse(c, http.BadRequest, nil, "get_offset", err.Error())
+	}
+
+	limit, err := h.getLimitParam(c)
+	if err != nil {
+		return h.handleResponse(c, http.BadRequest, nil, "get_limit", err.Error())
+	}
+
+	group, err := h.services.DynamicService().GetFullGroup(
+		c.Context(),
+		&dynamic_service.GetByIdRequest{
+			XId: slug,
+		},
+	)
+
+	if err != nil {
+		return h.handleResponse(c, http.NotFound, nil, "get_full_group", err.Error())
+	}
+
+	if group == nil || group.Status != 2 {
+		return h.handleResponse(c, http.NotFound, nil, "get_full_group", "valid group not found")
+	}
+
+	var filter = dynamic_service.GetAllRequest{
+		Data: &structpb.Struct{},
+	}
+	filter.Slug = slug
+	filter.Offset = int32(offset)
+	filter.Limit = int32(limit)
+	filter.Sort = c.Query("sort")
+	filter.Order = c.Query("order")
+	filter.Search = c.Query("search")
+	filter.Location = c.Get("location")
+
+	if len(c.Body()) > 5 {
+		if err := filter.Data.UnmarshalJSON(c.Body()); err != nil {
+			return h.handleResponse(c, http.BadRequest, nil, "unmarshal_entity", err.Error())
+		}
+	}
+
+	resp, err := h.services.EntityService().GetAll(c.Context(), &filter)
+	if err != nil {
+		return h.handleResponse(c, http.InternalServerError, nil, "get_entity_list", err.Error())
+	}
+
+	var response models.GetAllEntityResponse
+
+	for _, entity := range resp.Entities {
+		response.Entities = append(response.Entities, entity.AsMap())
+	}
+
+	response.Count = resp.Count
+
+	return h.handleResponse(c, http.OK, response, "get_entity_list", "")
+}

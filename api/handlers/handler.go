@@ -8,6 +8,7 @@ import (
 	"github.com/mirobidjon/go_dynamic_service/api/http"
 	"github.com/mirobidjon/go_dynamic_service/config"
 	"github.com/mirobidjon/go_dynamic_service/grpc/client"
+	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
 
 	"github.com/google/uuid"
 	"github.com/jellydator/ttlcache/v3"
@@ -15,6 +16,7 @@ import (
 	"github.com/saidamir98/udevs_pkg/logger"
 
 	fiber "github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
 type Handler struct {
@@ -186,4 +188,23 @@ func getCustomMessage(status http.Status, userLang, key string) string {
 	}
 
 	return customMessage
+}
+
+func (h *Handler) Limiter(max int, expiration_second time.Duration) func(*fiber.Ctx) error {
+	return limiter.New(limiter.Config{
+		Max:        max,
+		Expiration: time.Second * expiration_second,
+		KeyGenerator: func(c *fiber.Ctx) string {
+			return helper.GetIP(c, "")
+		},
+		LimitReached: func(c *fiber.Ctx) error {
+			h.log.Warn("LimitReached!!!->> Too many requests", logger.String("ip", helper.GetIP(c, "")),
+				logger.String("url", c.OriginalURL()), logger.String("method", c.Method()),
+				logger.String("body", string(c.Request().Body())))
+			return c.SendStatus(fiber.StatusTooManyRequests)
+		},
+		SkipFailedRequests:     false,
+		SkipSuccessfulRequests: false,
+		LimiterMiddleware:      limiter.FixedWindow{},
+	})
 }

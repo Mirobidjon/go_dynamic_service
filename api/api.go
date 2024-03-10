@@ -13,7 +13,6 @@ import (
 	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
 	fiberLogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/saidamir98/udevs_pkg/logger"
 )
@@ -54,19 +53,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 	r.Server().IdleTimeout = time.Minute * 2
 	r.Server().LogAllErrors = true
 
-	r.Use(limiter.New(limiter.Config{
-		Max:        150,
-		Expiration: 10 * time.Second,
-		KeyGenerator: func(c *fiber.Ctx) string {
-			return c.IP()
-		},
-		LimitReached: func(c *fiber.Ctx) error {
-			return c.SendStatus(fiber.StatusTooManyRequests)
-		},
-		SkipFailedRequests:     false,
-		SkipSuccessfulRequests: false,
-		LimiterMiddleware:      limiter.FixedWindow{},
-	}))
+	r.Use(h.Limiter(300, 10))
 
 	r.Use("/client-api/swagger/", basicauth.New(basicauth.Config{
 		Users: map[string]string{
@@ -111,6 +98,11 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 		configuration.Get("/group_types", h.GroupTypeConfiguration)
 		configuration.Get("/validation_functions", h.ValidationFunctionConfiguration)
 		configuration.Get("/regex", h.RegexConfiguration)
+	}
+
+	open := r.Group("/client-api/service", h.Limiter(100, 10))
+	{
+		open.Post("/:slug/get-all", h.GetAllServices)
 	}
 
 	return r

@@ -1,21 +1,19 @@
 package helper
 
-import (
-	"context"
-	"google.golang.org/grpc/metadata"
-	"strings"
-)
+import "github.com/gofiber/fiber/v2"
 
-func GetIP(ctx context.Context) string {
-	if headers, ok := metadata.FromIncomingContext(ctx); ok {
-		xForwardFor := headers.Get("x-forwarded-for")
-		if len(xForwardFor) > 0 && xForwardFor[0] != "" {
-			ips := strings.Split(xForwardFor[0], ",")
-			if len(ips) > 0 {
-				clientIp := ips[0]
-				return clientIp
-			}
-		}
+func GetIP(c *fiber.Ctx, signIp string) string {
+	if signIp != "" {
+		return signIp
 	}
-	return ""
+
+	ip := c.Get("X-Real-IP")
+	if ip == "" {
+		ips := c.IPs()
+		if len(ips) > 0 {
+			return ips[0]
+		}
+		return c.IP()
+	}
+	return ip
 }
