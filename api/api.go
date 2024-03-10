@@ -53,6 +53,11 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 	r.Server().IdleTimeout = time.Minute * 2
 	r.Server().LogAllErrors = true
 
+	open := r.Group("/client-api/service", h.Limiter(10, 5))
+	{
+		open.Post("/:slug/get-all", h.GetAllServices)
+	}
+
 	r.Use(h.Limiter(300, 10))
 
 	r.Use("/client-api/swagger/", basicauth.New(basicauth.Config{
@@ -98,11 +103,6 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 		configuration.Get("/group_types", h.GroupTypeConfiguration)
 		configuration.Get("/validation_functions", h.ValidationFunctionConfiguration)
 		configuration.Get("/regex", h.RegexConfiguration)
-	}
-
-	open := r.Group("/client-api/service", h.Limiter(100, 10))
-	{
-		open.Post("/:slug/get-all", h.GetAllServices)
 	}
 
 	return r
