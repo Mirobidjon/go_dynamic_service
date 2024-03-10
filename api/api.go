@@ -56,6 +56,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 	open := r.Group("/client-api/service", h.Limiter(10, 5))
 	{
 		open.Get("/:slug/get-all", h.GetAllServices)
+		open.Get("/:slug/get/:id", h.GetEntityService)
 	}
 
 	r.Use(h.Limiter(300, 10))

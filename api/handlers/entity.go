@@ -438,7 +438,6 @@ func (h *Handler) GetJoinEntity(c *fiber.Ctx) error {
 // @Param sort query string false "Sort"
 // @Param order query string false "Order"
 // @Param search query string false "Search"
-// @Param filter body models.Entity false "Filter Entity"
 // @Success 200 {object} http.Response{data=models.Entity} "Services"
 // @Response 400 {object} http.Response{data=string} "Bad Request"
 // @Failure 500 {object} http.Response{data=string} "Server Error"
@@ -498,4 +497,44 @@ func (h *Handler) GetAllServices(c *fiber.Ctx) error {
 	response.Count = resp.Count
 
 	return h.handleResponse(c, http.OK, response, "get_entity_list", "")
+}
+
+// GetEntityService godoc
+// @Security ApiKeyAuth
+// @ID get_entity_service
+// @Router /client-api/service/{slug}/get/{id} [GET]
+// @Param location header string false "Location" default("Asia/Tashkent")
+// @Summary Get Entity
+// @Description Get Entity
+// @Accept json
+// @Produce json
+// @Tags Entity
+// @Param slug path string true "Entity Slug"
+// @Param id path string true "Entity ID"
+// @Success 200 {object} http.Response{data=models.Entity} "OK"
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetEntityService(c *fiber.Ctx) error {
+	slug := c.Params("slug")
+	if slug == "" {
+		return h.handleResponse(c, http.BadRequest, nil, "invalid_slug", "slug is required")
+	}
+
+	var entity dynamic_service.GetByPk
+	entity.Slug = slug
+	entity.XId = c.Params("id")
+	entity.Location = c.Get("location")
+
+	if entity.XId == "" {
+		return h.handleResponse(c, http.BadRequest, nil, "invalid_id", "id is required")
+	}
+
+	resp, err := h.services.EntityService().GetById(c.Context(), &entity)
+	if err != nil {
+		return h.handleResponse(c, http.InternalServerError, nil, "get_entity", err.Error())
+	}
+
+	response := resp.Data.AsMap()
+
+	return h.handleResponse(c, http.OK, response, "get_entity", "")
 }

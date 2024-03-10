@@ -1549,11 +1549,6 @@ paths:
         in: query
         name: search
         type: string
-      - description: Filter Entity
-        in: body
-        name: filter
-        schema:
-          $ref: '#/definitions/models.Entity'
       produces:
       - application/json
       responses:
@@ -1587,6 +1582,63 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get All Services
+      tags:
+      - Entity
+  /client-api/service/{slug}/get/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Entity
+      operationId: get_entity_service
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Entity
       tags:
       - Entity
 securityDefinitions:
