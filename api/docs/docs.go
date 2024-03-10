@@ -1146,7 +1146,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
+                            "$ref": "#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group"
                         }
                     }
                 ],
@@ -1162,7 +1162,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
+                                            "$ref": "#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group"
                                         }
                                     }
                                 }
@@ -1248,7 +1248,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
+                                            "$ref": "#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group"
                                         }
                                     }
                                 }
@@ -1325,7 +1325,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
+                            "$ref": "#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group"
                         }
                     }
                 ],
@@ -1499,7 +1499,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
+                                            "$ref": "#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group"
                                         }
                                     }
                                 }
@@ -2155,6 +2155,137 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/client-api/service/{slug}/get-all": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get All Services",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entity"
+                ],
+                "summary": "Get All Services",
+                "operationId": "get_all_service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"Asia/Tashkent\"",
+                        "description": "Location",
+                        "name": "location",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Entity Slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Order",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "description": "Filter Entity",
+                        "name": "filter",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/models.Entity"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Services",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Entity"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2254,26 +2385,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.Response": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "description": {
-                    "type": "string"
-                },
-                "error": {},
-                "message": {
-                    "type": "string"
-                },
-                "requestId": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "mirobidjon_go_dynamic_service_api_models.Group": {
+        "github_com_mirobidjon_go_dynamic_service_api_models.Group": {
             "type": "object",
             "properties": {
                 "description": {
@@ -2296,6 +2408,25 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "integer"
+                }
+            }
+        },
+        "http.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "description": {
+                    "type": "string"
+                },
+                "error": {},
+                "message": {
+                    "type": "string"
+                },
+                "requestId": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -2354,7 +2485,7 @@ const docTemplate = `{
                 "groups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/mirobidjon_go_dynamic_service_api_models.Group"
+                        "$ref": "#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group"
                     }
                 }
             }

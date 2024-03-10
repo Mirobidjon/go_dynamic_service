@@ -62,20 +62,7 @@ definitions:
       value:
         type: string
     type: object
-  http.Response:
-    properties:
-      data: {}
-      description:
-        type: string
-      error: {}
-      message:
-        type: string
-      requestId:
-        type: string
-      status:
-        type: string
-    type: object
-  mirobidjon_go_dynamic_service_api_models.Group:
+  github_com_mirobidjon_go_dynamic_service_api_models.Group:
     properties:
       description:
         type: string
@@ -91,6 +78,19 @@ definitions:
         type: string
       status:
         type: integer
+    type: object
+  http.Response:
+    properties:
+      data: {}
+      description:
+        type: string
+      error: {}
+      message:
+        type: string
+      requestId:
+        type: string
+      status:
+        type: string
     type: object
   models.Configuration:
     properties:
@@ -128,7 +128,7 @@ definitions:
         type: integer
       groups:
         items:
-          $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
+          $ref: '#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group'
         type: array
     type: object
   models.JoinGroupRequest:
@@ -804,7 +804,7 @@ paths:
         name: group
         required: true
         schema:
-          $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
+          $ref: '#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group'
       produces:
       - application/json
       responses:
@@ -815,7 +815,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
+                  $ref: '#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group'
               type: object
         "400":
           description: Bad Request
@@ -903,7 +903,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
+                  $ref: '#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group'
               type: object
         "400":
           description: Bad Request
@@ -944,7 +944,7 @@ paths:
         name: group
         required: true
         schema:
-          $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
+          $ref: '#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group'
       produces:
       - application/json
       responses:
@@ -1002,7 +1002,7 @@ paths:
             - $ref: '#/definitions/http.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/mirobidjon_go_dynamic_service_api_models.Group'
+                  $ref: '#/definitions/github_com_mirobidjon_go_dynamic_service_api_models.Group'
               type: object
         "400":
           description: Bad Request
@@ -1382,6 +1382,83 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update Entity
+      tags:
+      - Entity
+  /client-api/service/{slug}/get-all:
+    post:
+      consumes:
+      - application/json
+      description: Get All Services
+      operationId: get_all_service
+      parameters:
+      - default: '"Asia/Tashkent"'
+        description: Location
+        in: header
+        name: location
+        type: string
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        in: query
+        name: order
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Filter Entity
+        in: body
+        name: filter
+        schema:
+          $ref: '#/definitions/models.Entity'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Services
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Services
       tags:
       - Entity
 securityDefinitions:
