@@ -52,6 +52,7 @@ type Config struct {
 	MinioHost        string
 	MinioAccessKeyID string
 	MinioSecretKey   string
+	MinioBucketName  string
 	MinioImageHost   string
 	RPCPort          string
 
@@ -72,6 +73,8 @@ type Config struct {
 	Username  string
 	Password  string
 	SignInKey string
+
+	BaseURL string
 }
 
 // Load ...
@@ -106,14 +109,19 @@ func Load() Config {
 
 	config.PostgresMaxConnections = cast.ToInt32(getOrReturnDefaultValue("POSTGRES_MAX_CONNECTIONS", 30))
 
-	config.AuthServiceHost = cast.ToString(getOrReturnDefaultValue("AUTH_SERVICE_HOST", "grpc-auth.soliqservis.local"))
+	config.AuthServiceHost = cast.ToString(getOrReturnDefaultValue("AUTH_SERVICE_HOST", ""))
 	config.AuthGRPCPort = cast.ToString(getOrReturnDefaultValue("AUTH_GRPC_PORT", ":8080"))
 
-	config.DynamicServiceHost = cast.ToString(getOrReturnDefaultValue("DYNAMIC_SERVICE_HOST", "localhost"))
+	config.DynamicServiceHost = cast.ToString(getOrReturnDefaultValue("DYNAMIC_SERVICE_HOST", ""))
 	config.DynamicGRPCPort = cast.ToString(getOrReturnDefaultValue("DYNAMIC_GRPC_PORT", ":9103"))
 
 	config.DefaultOffset = cast.ToString(getOrReturnDefaultValue("DEFAULT_OFFSET", "0"))
 	config.DefaultLimit = cast.ToString(getOrReturnDefaultValue("DEFAULT_LIMIT", "10"))
+
+	config.MinioHost = cast.ToString(getOrReturnDefaultValue("MINIO_HOST", ""))
+	config.MinioAccessKeyID = cast.ToString(getOrReturnDefaultValue("MINIO_ACCESS_KEY_ID", ""))
+	config.MinioSecretKey = cast.ToString(getOrReturnDefaultValue("MINIO_SECRET_KEY", ""))
+	config.MinioBucketName = cast.ToString(getOrReturnDefaultValue("MINIO_BUCKET_NAME", ""))
 
 	config.TGBotToken = cast.ToString(getOrReturnDefaultValue("TG_BOT_TOKEN", ""))
 	config.TGChatId = cast.ToInt64(getOrReturnDefaultValue("TG_CHAT_ID", "-1001514410398"))
@@ -123,6 +131,8 @@ func Load() Config {
 	config.Username = cast.ToString(getOrReturnDefaultValue("USERNAME", ""))
 	config.Password = cast.ToString(getOrReturnDefaultValue("PASSWORD", ""))
 	config.SignInKey = cast.ToString(getOrReturnDefaultValue("SIGN_IN_KEY", ""))
+
+	config.BaseURL = cast.ToString(getOrReturnDefaultValue("BASE_URL", ""))
 
 	return config
 }

@@ -108,5 +108,8 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 		configuration.Get("/regex", h.RegexConfiguration)
 	}
 
+	r.Post("/client-api/upload", h.HasAccessMiddleware, h.Upload)
+	r.Get("/client-api/download-file", h.DownloadFile)
+
 	return r
 }

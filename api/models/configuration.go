@@ -7,3 +7,8 @@ type Configuration struct {
 	Value       string `json:"value"`
 	FieldType   string `json:"field_type"`
 }
+
+type Url struct {
+	Link     string `json:"link"`
+	FileName string `json:"file_name"`
+}
