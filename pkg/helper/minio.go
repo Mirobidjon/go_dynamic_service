@@ -11,10 +11,9 @@ import (
 )
 
 func MinioUploader(cfg config.Config, object multipart.File, fileName, contentType string, fileSize int64) error {
-
-	minioClient, err := minio.New(cfg.MinioEndpoint, &minio.Options{
+	minioClient, err := minio.New(cfg.MinioHost, &minio.Options{
 		Creds:  mincre.NewStaticV4(cfg.MinioAccessKeyID, cfg.MinioSecretKey, ""),
-		Secure: false,
+		Secure: true,
 	})
 	if err != nil {
 		return fmt.Errorf("error while getting %s minio client err: %v", fileName, err)

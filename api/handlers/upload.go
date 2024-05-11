@@ -11,7 +11,6 @@ import (
 	mincre "github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/mirobidjon/go_dynamic_service/api/http"
 	"github.com/mirobidjon/go_dynamic_service/api/models"
-	"github.com/mirobidjon/go_dynamic_service/config"
 	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -53,9 +52,9 @@ func (h *Handler) DownloadFile(c *fiber.Ctx) error {
 	}()
 
 	// Initialize a Minio client.
-	minioClient, err := minio.New(config.Load().MinioEndpoint, &minio.Options{
-		Creds:  mincre.NewStaticV4(config.Load().MinioAccessKeyID, config.Load().MinioSecretKey, ""),
-		Secure: false,
+	minioClient, err := minio.New(h.cfg.MinioHost, &minio.Options{
+		Creds:  mincre.NewStaticV4(h.cfg.MinioAccessKeyID, h.cfg.MinioSecretKey, ""),
+		Secure: true,
 	})
 	if err != nil {
 		return err
