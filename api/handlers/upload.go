@@ -86,7 +86,7 @@ func (h *Handler) DownloadFile(c *fiber.Ctx) error {
 // @Accept multipart/form-data
 // @Produce json
 // @Param file formData file true "file"
-// @Success 201 {object} http.Response{data=models.PhotoUrl} "Success"
+// @Success 201 {object} http.Response{data=models.Url} "Success"
 // @Response 422 {object} http.Response{error=string} "Validation Error"
 // @Response 400 {object} http.Response{error=string} "Bad Request"
 // @Failure 500 {object} http.Response{error=string} "Server Error"
