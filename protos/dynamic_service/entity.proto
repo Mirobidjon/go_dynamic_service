@@ -58,6 +58,18 @@ message LookUps {
     string as = 4;
 }
 
+message AggregationGroup {
+    string _id = 1;
+    string field = 2;
+    string accumulator = 3;
+    string expression = 4;
+}
+
+message Aggregate {
+    repeated LookUps lookups = 4;
+    AggregationGroup group = 5;
+}
+
 message GetJoinRequest {
     string slug = 1;
     int32 limit = 2;
@@ -67,5 +79,5 @@ message GetJoinRequest {
     string search = 6;
     google.protobuf.Struct data = 7;
     string location = 8;
-    repeated LookUps lookups = 9;
+    Aggregate aggregate = 9;
 }

@@ -64,3 +64,8 @@ type Group struct {
 	Fields      []*Field `json:"fields"`
 	Children    []*Group `json:"children"`
 }
+
+type Pair struct {
+	Key   string `json:"key"`
+	Value any    `json:"value"`
+}

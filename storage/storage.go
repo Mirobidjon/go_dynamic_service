@@ -42,7 +42,7 @@ type EntityI interface {
 	Delete(ctx context.Context, slug string, id string) error
 	Get(ctx context.Context, slug string, id string) (map[string]interface{}, error)
 	List(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.D) ([]map[string]interface{}, error)
-	JoinList(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.A, lookups []*pd.LookUps) ([]map[string]interface{}, error)
+	JoinList(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.A, aggregate *pd.Aggregate) ([]map[string]interface{}, error)
 	Count(ctx context.Context, slug string, filter bson.D) (int64, error)
 	JoinCount(ctx context.Context, slug string, filter bson.A) (int64, error)
 	QueryFilter(req map[string]interface{}, group *pd.Group, search, location string) (bson.D, error)

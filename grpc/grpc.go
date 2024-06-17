@@ -78,7 +78,7 @@ func handlePanic() {
 
 		err := helper.SendTelegramMessage(errMsg)
 		if err != nil {
-			fmt.Printf("failed to send message on tg: %v", err)
+			fmt.Printf("failed to send message on tg: %v, errMsg: %s", err, errMsg)
 		}
 	}
 }

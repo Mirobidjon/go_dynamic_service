@@ -259,7 +259,7 @@ func (s *entityRepo) GetJoin(ctx context.Context, req *pb.GetJoinRequest) (*pb.G
 		return nil, helper.HandleError(s.log, err, "error while getting filter", req, codes.Internal)
 	}
 
-	entities, err := s.stg.Entity().JoinList(ctx, req.Slug, req.Order, req.Sort, req.Limit, req.Offset, filter, req.Lookups)
+	entities, err := s.stg.Entity().JoinList(ctx, req.Slug, req.Order, req.Sort, req.Limit, req.Offset, filter, req.Aggregate)
 	if err != nil {
 		return nil, helper.HandleError(s.log, err, "error while getting "+req.Slug, req, codes.Internal)
 	}

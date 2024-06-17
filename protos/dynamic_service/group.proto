@@ -59,6 +59,7 @@ message Field {
     int32 max = 17;
     string default_value = 18;
     int32 is_searchable = 19;
+    bool is_array = 20;
 }
 
 message SelectType {
@@ -66,6 +67,7 @@ message SelectType {
     string name = 2;
     string description = 3;
     string value = 4;
+    string value_type = 5;
 }
 
 message GetAllGroupRequest {

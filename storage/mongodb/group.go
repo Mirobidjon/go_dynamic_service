@@ -156,7 +156,10 @@ func (r *groupRepo) GetAllGroup(ctx context.Context, req *pd.GetAllGroupRequest)
 	)
 
 	opts.SetLimit(int64(req.Limit))
-	opts.SetSkip(int64(req.Offset))
+
+	if req.Offset > 0 {
+		opts.SetSkip(int64(req.Offset))
+	}
 
 	if req.ParentId != "" {
 		opts.SetSort(bson.M{
@@ -347,7 +350,10 @@ func (r *groupRepo) GetAllField(ctx context.Context, req *pd.GetAllFieldRequest)
 	)
 
 	opts.SetLimit(int64(req.Limit))
-	opts.SetSkip(int64(req.Offset))
+	if req.Offset > 0 {
+		opts.SetSkip(int64(req.Offset))
+	}
+
 	opts.SetSort(bson.D{
 		bson.E{Key: "order_number", Value: 1},
 		bson.E{Key: "created_at", Value: -1},

@@ -56,6 +56,10 @@ func (h *Handler) SignIn(c *fiber.Ctx) error {
 }
 
 func (h *Handler) HasAccessMiddleware(c *fiber.Ctx) error {
+	if h.cfg.Environment == "local" {
+		return c.Next()
+	}
+
 	accessToken := c.Get("Authorization")
 
 	if accessToken == "" {

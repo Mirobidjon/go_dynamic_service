@@ -2810,6 +2810,9 @@ const docTemplate = `{
                 "group_id": {
                     "type": "string"
                 },
+                "is_array": {
+                    "type": "boolean"
+                },
                 "is_required": {
                     "type": "boolean"
                 },
@@ -2882,6 +2885,9 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "string"
+                },
+                "value_type": {
+                    "type": "string"
                 }
             }
         },
@@ -2926,6 +2932,37 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Aggregate": {
+            "type": "object",
+            "properties": {
+                "group": {
+                    "$ref": "#/definitions/models.AggregationGroup"
+                },
+                "lookups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Lookup"
+                    }
+                }
+            }
+        },
+        "models.AggregationGroup": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "accumulator": {
+                    "type": "string"
+                },
+                "expression": {
+                    "type": "string"
+                },
+                "field": {
                     "type": "string"
                 }
             }
@@ -2996,14 +3033,11 @@ const docTemplate = `{
                 "_id": {
                     "type": "string"
                 },
+                "aggregate": {
+                    "$ref": "#/definitions/models.Aggregate"
+                },
                 "from_date": {
                     "type": "string"
-                },
-                "lookups": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Lookup"
-                    }
                 },
                 "name": {
                     "type": "string"

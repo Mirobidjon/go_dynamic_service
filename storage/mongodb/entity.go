@@ -135,7 +135,7 @@ func (r *entityRepo) List(ctx context.Context, slug, order, sort string, limit, 
 	return result, nil
 }
 
-func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.A, lookups []*pd.LookUps) ([]map[string]interface{}, error) {
+func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.A, aggregate *pd.Aggregate) ([]map[string]interface{}, error) {
 	var (
 		col     = r.db.Collection(slug)
 		orderBy int32
@@ -143,10 +143,6 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 
 	if limit <= 0 {
 		limit = 10
-	}
-
-	if offset < 0 {
-		offset = 0
 	}
 
 	if order == "" {
@@ -167,9 +163,11 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 		"$limit": limit,
 	})
 
-	filter = append(filter, bson.M{
-		"$skip": offset,
-	})
+	if offset > 0 {
+		filter = append(filter, bson.M{
+			"$skip": offset,
+		})
+	}
 
 	filter = append(filter, bson.M{
 		"$sort": bson.M{
@@ -177,13 +175,25 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 		},
 	})
 
-	for _, lookup := range lookups {
+	for _, lookup := range aggregate.GetLookups() {
 		filter = append(filter, bson.M{
 			"$lookup": bson.M{
 				"from":         lookup.From,
 				"localField":   lookup.LocalField,
 				"foreignField": lookup.ForeignField,
 				"as":           lookup.As,
+			},
+		})
+	}
+
+	if aggregate.GetGroup() != nil {
+		// field ga hohlagan param berish mumkin, lekin accumulatorga faqat sum, avg, min, max, push, first, last, expression ga esa table da bo'lgan field nomini berish kerak
+		filter = append(filter, bson.M{
+			"$group": bson.M{
+				"_id": "$" + aggregate.Group.XId,
+				aggregate.Group.Field: bson.M{
+					"$" + aggregate.Group.Accumulator: "$" + aggregate.Group.Expression,
+				},
 			},
 		})
 	}
@@ -335,7 +345,7 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 			})
 		}
 
-		if f.IsSearchable == 1 {
+		if f.IsSearchable == 1 && f.FieldType != models.FieldTypeNumber && f.FieldType != models.FieldTypeFloat {
 			if cast.ToString(val) == "on_search" {
 				filter = append(filter, bson.M{
 					"$match": bson.M{
@@ -394,6 +404,27 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 					},
 				})
 			}
+		}
+
+		if f.FieldType == models.FieldTypeNumber || f.FieldType == models.FieldTypeFloat {
+			numberVal, ok := val.(models.Pair)
+			if ok {
+				// TODO: add validation to the key
+				// if !helper.Check
+				filter = append(filter, bson.M{
+					"$match": bson.M{
+						slugStr: bson.M{
+							numberVal.Key: numberVal.Value,
+						},
+					},
+				})
+			}
+
+			filter = append(filter, bson.M{
+				"$match": bson.M{
+					slugStr: val,
+				},
+			})
 		}
 	}
 
@@ -464,6 +495,17 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 
 				filter = append(filter, bson.E{Key: slugStr, Value: val})
 			}
+		}
+
+		if f.FieldType == models.FieldTypeNumber || f.FieldType == models.FieldTypeFloat {
+			numberVal, ok := val.(models.Pair)
+			if ok {
+				// TODO: add validation to the key
+				// if !helper.Check
+				filter = append(filter, bson.E{Key: slugStr, Value: bson.D{{Key: numberVal.Key, Value: numberVal.Value}}})
+			}
+
+			filter = append(filter, bson.E{Key: slugStr, Value: val})
 		}
 	}
 

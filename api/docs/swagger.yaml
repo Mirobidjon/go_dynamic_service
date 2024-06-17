@@ -13,6 +13,8 @@ definitions:
         type: string
       group_id:
         type: string
+      is_array:
+        type: boolean
       is_required:
         type: boolean
       is_searchable:
@@ -61,6 +63,8 @@ definitions:
         type: string
       value:
         type: string
+      value_type:
+        type: string
     type: object
   github_com_mirobidjon_go_dynamic_service_api_models.Group:
     properties:
@@ -90,6 +94,26 @@ definitions:
       requestId:
         type: string
       status:
+        type: string
+    type: object
+  models.Aggregate:
+    properties:
+      group:
+        $ref: '#/definitions/models.AggregationGroup'
+      lookups:
+        items:
+          $ref: '#/definitions/models.Lookup'
+        type: array
+    type: object
+  models.AggregationGroup:
+    properties:
+      _id:
+        type: string
+      accumulator:
+        type: string
+      expression:
+        type: string
+      field:
         type: string
     type: object
   models.Configuration:
@@ -135,12 +159,10 @@ definitions:
     properties:
       _id:
         type: string
+      aggregate:
+        $ref: '#/definitions/models.Aggregate'
       from_date:
         type: string
-      lookups:
-        items:
-          $ref: '#/definitions/models.Lookup'
-        type: array
       name:
         type: string
       to_date:

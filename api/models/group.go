@@ -106,9 +106,21 @@ type Lookup struct {
 }
 
 type JoinGroupRequest struct {
-	XId      string   `json:"_id"`
-	Name     string   `json:"name"`
-	FromDate string   `json:"from_date"`
-	ToDate   string   `json:"to_date"`
-	LookUps  []Lookup `json:"lookups"`
+	XId       string     `json:"_id"`
+	Name      string     `json:"name"`
+	FromDate  string     `json:"from_date"`
+	ToDate    string     `json:"to_date"`
+	Aggregate *Aggregate `json:"aggregate"`
+}
+
+type Aggregate struct {
+	Lookups []*Lookup         `json:"lookups"`
+	Group   *AggregationGroup `json:"group"`
+}
+
+type AggregationGroup struct {
+	XId         string `json:"_id"`
+	Field       string `json:"field"`
+	Accumulator string `json:"accumulator"`
+	Expression  string `json:"expression"`
 }
