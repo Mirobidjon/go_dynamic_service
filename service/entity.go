@@ -270,8 +270,13 @@ func (s *entityRepo) GetJoin(ctx context.Context, req *pb.GetJoinRequest) (*pb.G
 	}
 
 	for _, item := range entities {
-		item["created_at"], _ = helper.ToLocationTime(cast.ToString(item["created_at"]), req.Location)
-		item["updated_at"], _ = helper.ToLocationTime(cast.ToString(item["updated_at"]), req.Location)
+		if _, ok := item["created_at"]; ok {
+			item["created_at"], _ = helper.ToLocationTime(cast.ToString(item["created_at"]), req.Location)
+		}
+
+		if _, ok := item["updated_at"]; ok {
+			item["updated_at"], _ = helper.ToLocationTime(cast.ToString(item["updated_at"]), req.Location)
+		}
 
 		entity, err := helper.ToProtoStruct(item)
 		if err != nil {

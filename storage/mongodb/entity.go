@@ -18,17 +18,31 @@ import (
 )
 
 type entityRepo struct {
-	db *mongo.Database
+	db          *mongo.Database
+	collections map[string]*mongo.Collection
 }
 
 func NewEntityRepo(db *mongo.Database) storage.EntityI {
 	return &entityRepo{
-		db: db,
+		db:          db,
+		collections: make(map[string]*mongo.Collection),
 	}
 }
 
+func (r *entityRepo) Disconnect() error {
+	return r.db.Client().Disconnect(context.Background())
+}
+
+func (r *entityRepo) getCollection(slug string) *mongo.Collection {
+	if r.collections[slug] == nil {
+		r.collections[slug] = r.db.Collection(slug)
+	}
+
+	return r.collections[slug]
+}
+
 func (r *entityRepo) Create(ctx context.Context, slug string, body map[string]interface{}) error {
-	col := r.db.Collection(slug)
+	col := r.getCollection(slug)
 
 	body["created_at"] = helper.TimeNow()
 	body["updated_at"] = helper.TimeNow()
@@ -38,7 +52,7 @@ func (r *entityRepo) Create(ctx context.Context, slug string, body map[string]in
 }
 
 func (r *entityRepo) Update(ctx context.Context, slug string, id string, body map[string]interface{}) error {
-	col := r.db.Collection(slug)
+	col := r.getCollection(slug)
 
 	objId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -55,7 +69,7 @@ func (r *entityRepo) Update(ctx context.Context, slug string, id string, body ma
 }
 
 func (r *entityRepo) Delete(ctx context.Context, slug string, id string) error {
-	col := r.db.Collection(slug)
+	col := r.getCollection(slug)
 
 	objId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -67,7 +81,7 @@ func (r *entityRepo) Delete(ctx context.Context, slug string, id string) error {
 }
 
 func (r *entityRepo) Get(ctx context.Context, slug string, id string) (map[string]interface{}, error) {
-	col := r.db.Collection(slug)
+	col := r.getCollection(slug)
 
 	objId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -81,7 +95,7 @@ func (r *entityRepo) Get(ctx context.Context, slug string, id string) (map[strin
 
 func (r *entityRepo) List(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.D) ([]map[string]interface{}, error) {
 	var (
-		col     = r.db.Collection(slug)
+		col     = r.getCollection(slug)
 		opts    = options.Find()
 		orderBy int32
 	)
@@ -137,7 +151,7 @@ func (r *entityRepo) List(ctx context.Context, slug, order, sort string, limit, 
 
 func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.A, aggregate *pd.Aggregate) ([]map[string]interface{}, error) {
 	var (
-		col     = r.db.Collection(slug)
+		col     = r.getCollection(slug)
 		orderBy int32
 	)
 
@@ -198,7 +212,7 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 		})
 	}
 
-	fmt.Println(filter)
+	// fmt.Println(filter)
 
 	var result []map[string]interface{}
 	cur, err := col.Aggregate(ctx, filter)
@@ -220,13 +234,13 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 }
 
 func (r *entityRepo) Count(ctx context.Context, slug string, filter bson.D) (int64, error) {
-	col := r.db.Collection(slug)
+	col := r.getCollection(slug)
 
 	return col.CountDocuments(ctx, filter)
 }
 
 func (r *entityRepo) JoinCount(ctx context.Context, slug string, filter bson.A) (int64, error) {
-	col := r.db.Collection(slug)
+	col := r.getCollection(slug)
 
 	filter = append(filter, bson.M{
 		"$count": "count",
@@ -414,7 +428,7 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 				filter = append(filter, bson.M{
 					"$match": bson.M{
 						slugStr: bson.M{
-							numberVal.Key: numberVal.Value,
+							numberVal.Operator: numberVal.Value,
 						},
 					},
 				})
@@ -502,7 +516,7 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 			if ok {
 				// TODO: add validation to the key
 				// if !helper.Check
-				filter = append(filter, bson.E{Key: slugStr, Value: bson.D{{Key: numberVal.Key, Value: numberVal.Value}}})
+				filter = append(filter, bson.E{Key: slugStr, Value: bson.D{{Key: numberVal.Operator, Value: numberVal.Value}}})
 			}
 
 			filter = append(filter, bson.E{Key: slugStr, Value: val})

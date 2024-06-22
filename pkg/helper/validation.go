@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -131,7 +132,7 @@ func IsValidEmail(email interface{}) bool {
 	return r.MatchString(emailStr)
 }
 
-func IsValidUUID(id interface{}) bool {
+func IsValidUUID(id any) bool {
 	switch s := id.(type) {
 	case string, []byte, []rune:
 		uuidStr := cast.ToString(id)
@@ -146,19 +147,19 @@ func IsValidUUID(id interface{}) bool {
 	}
 }
 
-func IsValidTime(value interface{}) bool {
+func IsValidTime(value any) bool {
 	valueStr := cast.ToString(value)
 	_, err := time.Parse(config.TimeStampLayout, valueStr)
 	return err == nil
 }
 
-func IsValidDate(value interface{}) bool {
+func IsValidDate(value any) bool {
 	valueStr := cast.ToString(value)
 	_, err := time.Parse(config.DateLayout, valueStr)
 	return err == nil
 }
 
-func IsValidObjectId(value interface{}) bool {
+func IsValidObjectId(value any) bool {
 	ok := false
 	defer func() {
 		fmt.Println("IsValidObjectId", value, "ok", ok)
@@ -180,4 +181,52 @@ func IsValidObjectId(value interface{}) bool {
 	default:
 		return ok
 	}
+}
+
+func IsValidGeoPoint(value any) bool {
+	valueStr, err := json.Marshal(value)
+	if err != nil {
+		return false
+	}
+
+	var point models.GeoPoint
+	if err := json.Unmarshal(valueStr, &point); err != nil {
+		return false
+	}
+
+	if point.Type != "Point" {
+		return false
+	}
+
+	if len(point.Coordinates) != 2 {
+		return false
+	}
+
+	return true
+}
+
+func IsValidGeoPolygon(value any) bool {
+	valueStr, err := json.Marshal(value)
+	if err != nil {
+		return false
+	}
+
+	var polygon models.GeoPolygon
+	if err := json.Unmarshal(valueStr, &polygon); err != nil {
+		return false
+	}
+
+	if polygon.Type != "Polygon" {
+		return false
+	}
+
+	if len(polygon.Coordinates) < 3 {
+		return false
+	}
+
+	if polygon.Coordinates[0][0] != polygon.Coordinates[len(polygon.Coordinates)-1][0] || polygon.Coordinates[0][1] != polygon.Coordinates[len(polygon.Coordinates)-1][1] {
+		return false
+	}
+
+	return true
 }

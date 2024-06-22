@@ -87,7 +87,7 @@ func CheckDataForPatch(obj interface{}, group *pb.Group, location *string) error
 				field := group.Slug + "." + v.Slug
 
 				if _, ok := data[v.Slug]; ok {
-					if err := CheckOnlyOneField(data, v, location, field); err != nil {
+					if err := CheckOnlyOneField(data, v, location, field, 0); err != nil {
 						return err
 					}
 				}
@@ -203,7 +203,7 @@ func CheckFieldForPatch(data map[string]interface{}, group *pb.Group, location *
 		field := group.Slug + "." + v.Slug
 
 		if _, ok := data[v.Slug]; ok {
-			if err := CheckOnlyOneField(data, v, location, field); err != nil {
+			if err := CheckOnlyOneField(data, v, location, field, 0); err != nil {
 				return err
 			}
 		}
@@ -216,7 +216,7 @@ func CheckField(data map[string]interface{}, group *pb.Group, location *string) 
 	for _, v := range group.Fields {
 		field := group.Slug + "." + v.Slug
 
-		if err := CheckOnlyOneField(data, v, location, field); err != nil {
+		if err := CheckOnlyOneField(data, v, location, field, 0); err != nil {
 			return err
 		}
 	}
@@ -224,10 +224,27 @@ func CheckField(data map[string]interface{}, group *pb.Group, location *string) 
 	return nil
 }
 
-func CheckOnlyOneField(data map[string]interface{}, v *pb.Field, location *string, field string) error {
+func CheckOnlyOneField(data map[string]interface{}, v *pb.Field, location *string, field string, index int) error {
 	var err error
 
-	if v.IsRequired {
+	if v.IsArray && index < 1 {
+		if reflect.TypeOf(data[v.Slug]).Kind() != reflect.Slice {
+			return fmt.Errorf("%s is not valid (not array)", field)
+		}
+
+		arr := cast.ToSlice(data[v.Slug])
+
+		for i := range arr {
+			if err := CheckOnlyOneField(cast.ToStringMap(arr[i]), v, location, field, i+1); err != nil {
+				return err
+			}
+		}
+
+		clear(arr)
+		return nil
+	}
+
+	if _, ok := data[v.Slug]; ok || v.IsRequired {
 		if _, ok := data[v.Slug]; !ok {
 			return fmt.Errorf("%s is required (empty)", field)
 		}
@@ -237,6 +254,18 @@ func CheckOnlyOneField(data map[string]interface{}, v *pb.Field, location *strin
 
 			if data[v.Slug] == EmptyValue(&v.FieldType) {
 				return fmt.Errorf("%s is required (empty)", field)
+			}
+		}
+
+		if v.FieldType == models.FieldTypePoint {
+			if IsValidGeoPoint(data[v.Slug]) {
+				return fmt.Errorf("%s is not valid (point)", field)
+			}
+		}
+
+		if v.FieldType == models.FieldTypePolygon {
+			if IsValidGeoPolygon(data[v.Slug]) {
+				return fmt.Errorf("%s is not valid (polygon)", field)
 			}
 		}
 

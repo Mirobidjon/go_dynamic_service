@@ -14,6 +14,7 @@ const (
 	FieldTypeObjectID = "object_id"
 	FieldTypeJsonb    = "jsonb"
 	FieldTypePolygon  = "polygon"
+	FieldTypePoint    = "point"
 )
 
 type SelectTypes struct {
@@ -66,6 +67,16 @@ type Group struct {
 }
 
 type Pair struct {
-	Key   string `json:"key"`
-	Value any    `json:"value"`
+	Operator string `json:"operator"`
+	Value    any    `json:"value"`
+}
+
+type GeoPoint struct {
+	Type        string    `json:"type"`
+	Coordinates []float64 `json:"coordinates"`
+}
+
+type GeoPolygon struct {
+	Type        string      `json:"type"`
+	Coordinates [][]float64 `json:"coordinates"`
 }
