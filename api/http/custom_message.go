@@ -6,6 +6,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Kutilmagan xatolik",
 		"oz": "Кутилмаган хатолик",
 		"ru": "Неизвестная ошибка",
+		"en": "Unknown error",
 	},
 
 	// BAD REQUEST
@@ -13,6 +14,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Avtorizatsiyadan o'tmagan",
 		"oz": "Авторизатсиядан ўтмаган",
 		"ru": "Не авторизован",
+		"en": "Unauthorized",
 	},
 
 	// BODY PARSE
@@ -20,6 +22,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Body parse xatoligi",
 		"oz": "Body parse хатолиги",
 		"ru": "Ошибка парсинга body",
+		"en": "Body parse error",
 	},
 
 	// QUERY PARSE
@@ -27,6 +30,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Query parse xatoligi",
 		"oz": "Query parse хатолиги",
 		"ru": "Ошибка парсинга query",
+		"en": "Query parse error",
 	},
 
 	// OFFSET LIMIT
@@ -34,11 +38,13 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Offsetni olishda xatolik yuz berdi",
 		"oz": "Offsetни олишда хатолик юз берди",
 		"ru": "Ошибка получения offset",
+		"en": "Error getting offset",
 	},
 	"get_limit": {
 		"uz": "Limitni olishda xatolik yuz berdi",
 		"oz": "Limitни олишда хатолик юз берди",
 		"ru": "Ошибка получения limit",
+		"en": "Error getting limit",
 	},
 
 	// CONVERT MAP TO STRUCT
@@ -46,6 +52,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Mapni structga o'girishda xatolik",
 		"oz": "Mapни structга ўгиришда хатолик",
 		"ru": "Ошибка конвертации map в struct",
+		"en": "Error converting map to struct",
 	},
 
 	// INVALID UUID
@@ -53,6 +60,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "UUID noto'g'ri",
 		"oz": "UUID нотўғри",
 		"ru": "Неверный UUID",
+		"en": "Invalid UUID",
 	},
 
 	// INVALID SLUG
@@ -60,6 +68,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Slug noto'g'ri",
 		"oz": "Slug нотўғри",
 		"ru": "Неверный Slug",
+		"en": "Invalid Slug",
 	},
 
 	// INVALID ID
@@ -67,6 +76,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "ID noto'g'ri",
 		"oz": "ID нотўғри",
 		"ru": "Неверный ID",
+		"en": "Invalid ID",
 	},
 
 	// BYTE TO PROTO
@@ -74,6 +84,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Byte to proto xatoligi",
 		"oz": "Byte to proto хатолиги",
 		"ru": "Ошибка byte to proto",
+		"en": "Error byte to proto",
 	},
 
 	// PROTO TO STRUCT
@@ -81,6 +92,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Proto to struct xatoligi",
 		"oz": "Proto to struct хатолиги",
 		"ru": "Ошибка proto to struct",
+		"en": "Error proto to struct",
 	},
 
 	// JSON MARSHAL
@@ -88,6 +100,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Json marshal xatoligi",
 		"oz": "Json marshal хатолиги",
 		"ru": "Ошибка json marshal",
+		"en": "Error json marshal",
 	},
 
 	// 	INVALID TOKEN
@@ -95,6 +108,7 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Token noto'g'ri",
 		"oz": "Token нотўғри",
 		"ru": "Неверный Token",
+		"en": "Invalid Token",
 	},
 
 	// ENTITY
@@ -102,36 +116,43 @@ var CustomErrorMessages = map[string]map[string]string{
 		"uz": "Entityni unmarshal qilishda xatolik yuz berdi",
 		"oz": "Entityни unmarshal қилишда хатолик юз берди",
 		"ru": "Ошибка при unmarshal entity",
+		"en": "Error unmarshal entity",
 	},
 	"create_entity": {
 		"uz": "Entityni yaratishda xatolik yuz berdi",
 		"oz": "Entityни яратишда хатолик юз берди",
 		"ru": "Ошибка при создании entity",
+		"en": "Error creating entity",
 	},
 	"update_entity": {
 		"uz": "Entityni yangilashda xatolik yuz berdi",
 		"oz": "Entityни янгилашда хатолик юз берди",
 		"ru": "Ошибка при обновлении entity",
+		"en": "Error updating entity",
 	},
 	"delete_entity": {
 		"uz": "Entityni o'chirishda xatolik yuz berdi",
 		"oz": "Entityни ўчиришда хатолик юз берди",
 		"ru": "Ошибка при удалении entity",
+		"en": "Error deleting entity",
 	},
 	"get_entity": {
 		"uz": "Entityni olishda xatolik yuz berdi",
 		"oz": "Entityни олишда хатолик юз берди",
 		"ru": "Ошибка при получении entity",
+		"en": "Error getting entity",
 	},
 	"get_entity_list": {
 		"uz": "Entitylar ro'yxatini olishda xatolik yuz berdi",
 		"oz": "Entityлар рўйхатини олишда хатолик юз берди",
 		"ru": "Ошибка при получении списка entity",
+		"en": "Error getting entity list",
 	},
 	"join_entity": {
 		"uz": "Entityni join qilishda xatolik yuz berdi",
 		"oz": "Entityни join қилишда хатолик юз берди",
 		"ru": "Ошибка при join entity",
+		"en": "Error join entity",
 	},
 
 	// CASHBOX

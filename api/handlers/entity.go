@@ -4,6 +4,7 @@ import (
 	"github.com/mirobidjon/go_dynamic_service/api/http"
 	"github.com/mirobidjon/go_dynamic_service/api/models"
 	"github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
 
 	fiber "github.com/gofiber/fiber/v2"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -537,4 +538,37 @@ func (h *Handler) GetEntityService(c *fiber.Ctx) error {
 	response := resp.Data.AsMap()
 
 	return h.handleResponse(c, http.OK, response, "get_entity", "")
+}
+
+// GetExampleEntity godoc
+// @Security ApiKeyAuth
+// @ID get_example_entity
+// @Router /client-api/entity/{slug}/example [GET]
+// @Summary Get Example Entity
+// @Description Get Example Entity
+// @Accept json
+// @Produce json
+// @Tags Entity
+// @Param slug path string true "Entity Slug"
+// @Success 200 {object} http.Response{data=models.Entity} "OK"
+// @Response 400 {object} http.Response{data=string} "Bad Request"
+// @Failure 500 {object} http.Response{data=string} "Server Error"
+func (h *Handler) GetExampleEntity(c *fiber.Ctx) error {
+	var group models.DynamicGroup
+
+	slug := c.Params("slug")
+	if slug == "" {
+		return h.handleResponse(c, http.BadRequest, nil, "invalid_slug", "slug is required")
+	}
+
+	resp, err := h.services.DynamicService().GetFullGroup(c.Context(), &dynamic_service.GetByIdRequest{XId: slug})
+	if err != nil {
+		return h.handleResponse(c, http.InternalServerError, nil, "get_full_group", err.Error())
+	}
+
+	if err := helper.ProtoToStruct(&group, resp); err != nil {
+		return h.handleResponse(c, http.InternalServerError, nil, "proto_to_struct", err.Error())
+	}
+
+	return h.handleResponse(c, http.OK, group, "default_success_message", "")
 }

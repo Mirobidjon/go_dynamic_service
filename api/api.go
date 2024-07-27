@@ -97,6 +97,7 @@ func SetUpRouter(h handlers.Handler, cfg config.Config) *fiber.App {
 		entity.Post("/:slug/get-all", h.GetAllEntityPost)
 		entity.Get("/:slug/get-all", h.GetAllEntityGet)
 		entity.Post("/:slug/get-join", h.GetJoinEntity)
+		entity.Get("/:slug/example", h.GetExampleEntity)
 	}
 
 	configuration := r.Group("/client-api/configuration", h.HasAccessMiddleware)

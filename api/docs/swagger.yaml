@@ -1213,6 +1213,53 @@ paths:
       summary: Delete Entity
       tags:
       - Entity
+  /client-api/entity/{slug}/example:
+    get:
+      consumes:
+      - application/json
+      description: Get Example Entity
+      operationId: get_example_entity
+      parameters:
+      - description: Entity Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Entity'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Example Entity
+      tags:
+      - Entity
   /client-api/entity/{slug}/get-all:
     get:
       consumes:
