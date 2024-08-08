@@ -169,25 +169,27 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 		orderBy = 1
 	}
 
-	if sort == "" {
+	if sort == "" && aggregate.GetGroup() == nil {
 		sort = "created_at"
 	}
 
-	filter = append(filter, bson.M{
-		"$limit": limit,
-	})
-
-	if offset > 0 {
+	if aggregate.GetGroup() == nil {
 		filter = append(filter, bson.M{
-			"$skip": offset,
+			"$limit": limit,
+		})
+
+		if offset > 0 {
+			filter = append(filter, bson.M{
+				"$skip": offset,
+			})
+		}
+
+		filter = append(filter, bson.M{
+			"$sort": bson.M{
+				sort: orderBy,
+			},
 		})
 	}
-
-	filter = append(filter, bson.M{
-		"$sort": bson.M{
-			sort: orderBy,
-		},
-	})
 
 	for _, lookup := range aggregate.GetLookups() {
 		filter = append(filter, bson.M{
@@ -212,7 +214,7 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 		})
 	}
 
-	// fmt.Println(filter)
+	fmt.Println(filter)
 
 	var result []map[string]interface{}
 	cur, err := col.Aggregate(ctx, filter)
