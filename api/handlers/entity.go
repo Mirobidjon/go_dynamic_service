@@ -405,6 +405,7 @@ func (h *Handler) GetJoinEntity(c *fiber.Ctx) error {
 		}
 
 		delete(filter.Data.Fields, "lookups")
+		delete(filter.Data.Fields, "aggregate")
 	}
 
 	resp, err := h.services.EntityService().GetJoin(c.Context(), &filter)
