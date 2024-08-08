@@ -214,7 +214,7 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 		})
 	}
 
-	fmt.Println(filter)
+	// fmt.Println(filter)
 
 	var result []map[string]interface{}
 	cur, err := col.Aggregate(ctx, filter)
