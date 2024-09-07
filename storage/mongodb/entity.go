@@ -68,6 +68,32 @@ func (r *entityRepo) Update(ctx context.Context, slug string, id string, body ma
 	return err
 }
 
+func (r *entityRepo) UpdateMany(ctx context.Context, slug string, ids []string, body map[string]interface{}) error {
+	col := r.getCollection(slug)
+
+	objIds := make([]primitive.ObjectID, len(ids))
+	for i, id := range ids {
+		objId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return fmt.Errorf("invalid id format")
+		}
+		objIds[i] = objId
+	}
+
+	filter := bson.M{"_id": bson.M{"$in": objIds}}
+
+	body["updated_at"] = helper.TimeNow()
+
+	delete(body, "created_at")
+	delete(body, "id")
+	delete(body, "_id")
+
+	update := bson.M{"$set": body}
+
+	_, err := col.UpdateMany(ctx, filter, update)
+	return err
+}
+
 func (r *entityRepo) Delete(ctx context.Context, slug string, id string) error {
 	col := r.getCollection(slug)
 
@@ -77,6 +103,24 @@ func (r *entityRepo) Delete(ctx context.Context, slug string, id string) error {
 	}
 
 	_, err = col.DeleteOne(ctx, bson.M{"_id": objId})
+	return err
+}
+
+func (r *entityRepo) DeleteMany(ctx context.Context, slug string, ids []string) error {
+	col := r.getCollection(slug)
+
+	objIds := make([]primitive.ObjectID, len(ids))
+	for i, id := range ids {
+		objId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return fmt.Errorf("invalid id format")
+		}
+		objIds[i] = objId
+	}
+
+	filter := bson.M{"_id": bson.M{"$in": objIds}}
+
+	_, err := col.DeleteMany(ctx, filter)
 	return err
 }
 
@@ -128,7 +172,7 @@ func (r *entityRepo) List(ctx context.Context, slug, order, sort string, limit, 
 		sort: orderBy,
 	})
 
-	fmt.Println(filter)
+	// fmt.Println(filter)
 
 	var result []map[string]interface{}
 	cur, err := col.Find(ctx, filter, opts)
@@ -169,7 +213,7 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 		orderBy = 1
 	}
 
-	if sort == "" && aggregate.GetGroup() == nil {
+	if sort == "" {
 		sort = "created_at"
 	}
 
@@ -203,15 +247,30 @@ func (r *entityRepo) JoinList(ctx context.Context, slug, order, sort string, lim
 	}
 
 	if aggregate.GetGroup() != nil {
+		// _id field bu shu field ga qarab group qiladi
 		// field ga hohlagan param berish mumkin, lekin accumulatorga faqat sum, avg, min, max, push, first, last, expression ga esa table da bo'lgan field nomini berish kerak
-		filter = append(filter, bson.M{
-			"$group": bson.M{
-				"_id": "$" + aggregate.Group.XId,
-				aggregate.Group.Field: bson.M{
-					"$" + aggregate.Group.Accumulator: "$" + aggregate.Group.Expression,
+
+		// accumulator: sum, avg, min, max, push, first, last
+		// expression: table da bo'lgan field nomi, agar bo'sh bo'lsa 1 avtomatik qo'shiladi
+		if aggregate.GetGroup().GetExpression() != "" {
+			filter = append(filter, bson.M{
+				"$group": bson.M{
+					"_id": "$" + aggregate.Group.XId,
+					aggregate.Group.Field: bson.M{
+						"$" + aggregate.Group.Accumulator: "$" + aggregate.Group.Expression,
+					},
 				},
-			},
-		})
+			})
+		} else {
+			filter = append(filter, bson.M{
+				"$group": bson.M{
+					"_id": "$" + aggregate.Group.XId,
+					aggregate.Group.Field: bson.M{
+						"$" + aggregate.Group.Accumulator: 1,
+					},
+				},
+			})
+		}
 	}
 
 	// fmt.Println(filter)
@@ -359,6 +418,7 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 					slugStr: primitive.Null{},
 				},
 			})
+			continue
 		}
 
 		if f.IsSearchable == 1 && f.FieldType != models.FieldTypeNumber && f.FieldType != models.FieldTypeFloat {
@@ -381,11 +441,19 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 					},
 				})
 			}
+			continue
 		}
 
 		if f.IsSearchable == 2 {
 			if f.FieldType == models.FieldTypeDate || f.FieldType == models.FieldTypeDateTime {
 				val, _ = helper.ToUTC(cast.ToString(val), location)
+
+				filter = append(filter, bson.M{
+					"$match": bson.M{
+						slugStr: val,
+					},
+				})
+				continue
 			}
 
 			if slug == "" && f.Slug == "_id" {
@@ -409,17 +477,46 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 						},
 					})
 				}
-			} else {
-				if f.FieldType == models.FieldTypeObjectID {
-					val, _ = helper.ToObjectID(val)
+				continue
+			}
+
+			if f.FieldType == models.FieldTypeObjectID {
+				objIds := strings.Split(cast.ToString(val), ",")
+				var objIdsHex []primitive.ObjectID
+
+				for _, objId := range objIds {
+					objIdHex, err := primitive.ObjectIDFromHex(objId)
+					if err != nil {
+						continue
+					}
+
+					objIdsHex = append(objIdsHex, objIdHex)
 				}
 
-				filter = append(filter, bson.M{
-					"$match": bson.M{
-						slugStr: val,
-					},
-				})
+				if len(objIdsHex) > 0 {
+					filter = append(filter, bson.M{
+						"$match": bson.M{
+							slugStr: bson.M{
+								"$in": objIdsHex,
+							},
+						},
+					})
+				}
+				continue
 			}
+
+			continue
+		}
+
+		if f.IsSearchable == 3 {
+			// check only equal
+			filter = append(filter, bson.M{
+				"$match": bson.M{
+					slugStr: val,
+				},
+			})
+
+			continue
 		}
 
 		if f.FieldType == models.FieldTypeNumber || f.FieldType == models.FieldTypeFloat {
@@ -441,6 +538,7 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 					slugStr: val,
 				},
 			})
+			continue
 		}
 	}
 
@@ -474,6 +572,7 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 
 		if val == "null" {
 			filter = append(filter, bson.E{Key: slugStr, Value: primitive.Null{}})
+			continue
 		}
 
 		if f.IsSearchable == 1 {
@@ -482,11 +581,15 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 			} else {
 				filter = append(filter, bson.E{Key: slugStr, Value: primitive.Regex{Pattern: cast.ToString(val), Options: "i"}})
 			}
+			continue
 		}
 
 		if f.IsSearchable == 2 {
 			if f.FieldType == models.FieldTypeDate || f.FieldType == models.FieldTypeDateTime {
 				val, _ = helper.ToUTC(cast.ToString(val), location)
+
+				filter = append(filter, bson.E{Key: slugStr, Value: val})
+				continue
 			}
 
 			if slug == "" && f.Slug == "_id" {
@@ -504,13 +607,41 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 				if len(objIdsHex) > 0 {
 					filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$in", Value: objIdsHex}}})
 				}
-			} else {
-				if f.FieldType == models.FieldTypeObjectID {
-					val, _ = helper.ToObjectID(val)
+				continue
+			}
+
+			if f.FieldType == models.FieldTypeObjectID {
+				objIds := strings.Split(cast.ToString(val), ",")
+				var objIdsHex []primitive.ObjectID
+
+				for _, objId := range objIds {
+					objIdHex, err := primitive.ObjectIDFromHex(objId)
+					if err != nil {
+						continue
+					}
+
+					objIdsHex = append(objIdsHex, objIdHex)
 				}
 
-				filter = append(filter, bson.E{Key: slugStr, Value: val})
+				if len(objIdsHex) > 0 {
+					filter = append(filter, bson.E{Key: slugStr, Value: bson.D{{Key: "$in", Value: objIdsHex}}})
+				}
+				continue
 			}
+
+			if f.FieldType == models.FieldTypeUuid {
+				uuids := strings.Split(cast.ToString(val), ",")
+				filter = append(filter, bson.E{Key: slugStr, Value: bson.D{{Key: "$in", Value: uuids}}})
+				continue
+			}
+
+			continue
+		}
+
+		if f.IsSearchable == 3 {
+			// check only equal
+			filter = append(filter, bson.E{Key: slugStr, Value: val})
+			continue
 		}
 
 		if f.FieldType == models.FieldTypeNumber || f.FieldType == models.FieldTypeFloat {
@@ -522,6 +653,7 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 			}
 
 			filter = append(filter, bson.E{Key: slugStr, Value: val})
+			continue
 		}
 	}
 

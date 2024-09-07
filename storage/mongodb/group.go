@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	pd "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
 	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
@@ -19,19 +20,21 @@ import (
 
 type groupRepo struct {
 	db    *mongo.Database
+	group *mongo.Collection
+	field *mongo.Collection
 	cache *ttlcache.Cache[string, string]
 }
 
 func NewGroupRepo(db *mongo.Database, cache *ttlcache.Cache[string, string]) storage.GroupI {
 	return &groupRepo{
 		db:    db,
+		group: db.Collection("group"),
+		field: db.Collection("field"),
 		cache: cache,
 	}
 }
 
 func (r *groupRepo) CreateGroup(ctx context.Context, req *pd.Group) error {
-	collection := r.db.Collection("group")
-
 	id := primitive.NewObjectID()
 
 	req.XId = id.Hex()
@@ -51,7 +54,7 @@ func (r *groupRepo) CreateGroup(ctx context.Context, req *pd.Group) error {
 		"order_number": req.OrderNumber,
 	}
 
-	_, err := collection.InsertOne(ctx, group)
+	_, err := r.group.InsertOne(ctx, group)
 
 	r.cache.DeleteAll()
 
@@ -59,8 +62,6 @@ func (r *groupRepo) CreateGroup(ctx context.Context, req *pd.Group) error {
 }
 
 func (r *groupRepo) GetGroupById(ctx context.Context, req *pd.GetByIdRequest) (*pd.Group, error) {
-	collection := r.db.Collection("group")
-
 	var (
 		key   = "_id"
 		value interface{}
@@ -75,13 +76,11 @@ func (r *groupRepo) GetGroupById(ctx context.Context, req *pd.GetByIdRequest) (*
 		value = id
 	}
 
-	err = collection.FindOne(ctx, bson.M{key: value}).Decode(&group)
+	err = r.group.FindOne(ctx, bson.M{key: value}).Decode(&group)
 	return &group, err
 }
 
 func (r *groupRepo) DeleteGroup(ctx context.Context, req *pd.GetByIdRequest) error {
-	collection := r.db.Collection("group")
-
 	var ids []primitive.ObjectID
 
 	arr := strings.Split(req.XId, ",")
@@ -98,14 +97,12 @@ func (r *groupRepo) DeleteGroup(ctx context.Context, req *pd.GetByIdRequest) err
 		return errors.New("id is empty")
 	}
 
-	_, err := collection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
+	_, err := r.group.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
 
 	return err
 }
 
 func (r *groupRepo) UpdateGroup(ctx context.Context, req *pd.Group) error {
-	collection := r.db.Collection("group")
-
 	var (
 		id     primitive.ObjectID
 		err    error
@@ -135,7 +132,7 @@ func (r *groupRepo) UpdateGroup(ctx context.Context, req *pd.Group) error {
 		"order_number": req.OrderNumber,
 	}
 
-	_, err = collection.UpdateOne(ctx,
+	_, err = r.group.UpdateOne(ctx,
 		bson.M{"_id": id},
 		bson.M{"$set": group},
 		&options.UpdateOptions{Upsert: &upsert},
@@ -147,8 +144,6 @@ func (r *groupRepo) UpdateGroup(ctx context.Context, req *pd.Group) error {
 }
 
 func (r *groupRepo) GetAllGroup(ctx context.Context, req *pd.GetAllGroupRequest) (*pd.GetAllGroupResponse, error) {
-	collection := r.db.Collection("group")
-
 	var (
 		groups []*pd.Group
 		filter bson.D
@@ -192,7 +187,7 @@ func (r *groupRepo) GetAllGroup(ctx context.Context, req *pd.GetAllGroupRequest)
 		filter = append(filter, bson.E{Key: "group_type", Value: req.GroupType})
 	}
 
-	cursor, err := collection.Find(ctx, filter, opts)
+	cursor, err := r.group.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +195,7 @@ func (r *groupRepo) GetAllGroup(ctx context.Context, req *pd.GetAllGroupRequest)
 		return nil, err
 	}
 
-	count, err := collection.CountDocuments(ctx, filter)
+	count, err := r.group.CountDocuments(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -212,8 +207,6 @@ func (r *groupRepo) GetAllGroup(ctx context.Context, req *pd.GetAllGroupRequest)
 }
 
 func (r *groupRepo) CreateField(ctx context.Context, req *pd.Field) error {
-	collection := r.db.Collection("field")
-
 	id := primitive.NewObjectID()
 	req.CreatedAt = helper.TimeNow()
 	req.UpdatedAt = helper.TimeNow()
@@ -239,9 +232,10 @@ func (r *groupRepo) CreateField(ctx context.Context, req *pd.Field) error {
 		"max":              req.Max,
 		"default_value":    req.DefaultValue,
 		"is_searchable":    req.IsSearchable,
+		"is_array":         req.IsArray,
 	}
 
-	_, err := collection.InsertOne(ctx, field)
+	_, err := r.field.InsertOne(ctx, field)
 
 	r.cache.DeleteAll()
 
@@ -249,21 +243,18 @@ func (r *groupRepo) CreateField(ctx context.Context, req *pd.Field) error {
 }
 
 func (r *groupRepo) GetFieldById(ctx context.Context, req *pd.GetByIdRequest) (*pd.Field, error) {
-	collection := r.db.Collection("field")
-
 	id, err := primitive.ObjectIDFromHex(req.XId)
 	if err != nil {
 		return nil, err
 	}
 
 	var field pd.Field
-	err = collection.FindOne(ctx, bson.M{"_id": id}).Decode(&field)
+	err = r.field.FindOne(ctx, bson.M{"_id": id}).Decode(&field)
 	return &field, err
 }
 
 func (r *groupRepo) DeleteField(ctx context.Context, req *pd.GetByIdRequest) error {
 	var ids []primitive.ObjectID
-	collection := r.db.Collection("field")
 
 	arr := strings.Split(req.XId, ",")
 
@@ -279,7 +270,7 @@ func (r *groupRepo) DeleteField(ctx context.Context, req *pd.GetByIdRequest) err
 		ids = append(ids, id)
 	}
 
-	_, err := collection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
+	_, err := r.field.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": ids}})
 
 	r.cache.DeleteAll()
 
@@ -287,8 +278,6 @@ func (r *groupRepo) DeleteField(ctx context.Context, req *pd.GetByIdRequest) err
 }
 
 func (r *groupRepo) UpdateField(ctx context.Context, req *pd.Field) error {
-	collection := r.db.Collection("field")
-
 	var (
 		id     primitive.ObjectID
 		err    error
@@ -326,9 +315,10 @@ func (r *groupRepo) UpdateField(ctx context.Context, req *pd.Field) error {
 		"max":              req.Max,
 		"default_value":    req.DefaultValue,
 		"is_searchable":    req.IsSearchable,
+		"is_array":         req.IsArray,
 	}
 
-	_, err = collection.UpdateOne(
+	_, err = r.field.UpdateOne(
 		ctx,
 		bson.M{"_id": id},
 		&bson.M{"$set": field},
@@ -341,8 +331,6 @@ func (r *groupRepo) UpdateField(ctx context.Context, req *pd.Field) error {
 }
 
 func (r *groupRepo) GetAllField(ctx context.Context, req *pd.GetAllFieldRequest) (*pd.GetAllFieldResponse, error) {
-	collection := r.db.Collection("field")
-
 	var (
 		fields []*pd.Field
 		opts   = options.Find()
@@ -380,7 +368,7 @@ func (r *groupRepo) GetAllField(ctx context.Context, req *pd.GetAllFieldRequest)
 		filter = append(filter, bson.E{Key: "slug", Value: req.Slug})
 	}
 
-	cursor, err := collection.Find(ctx, filter, opts)
+	cursor, err := r.field.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -389,7 +377,7 @@ func (r *groupRepo) GetAllField(ctx context.Context, req *pd.GetAllFieldRequest)
 		return nil, err
 	}
 
-	count, err := collection.CountDocuments(ctx, filter)
+	count, err := r.field.CountDocuments(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -401,7 +389,6 @@ func (r *groupRepo) GetAllField(ctx context.Context, req *pd.GetAllFieldRequest)
 }
 
 func (r *groupRepo) GetFullGroup(ctx context.Context, req *pd.GetByIdRequest) (*pd.Group, error) {
-
 	item := r.cache.Get(req.XId)
 	if item != nil {
 		var group = pd.Group{}
@@ -414,16 +401,14 @@ func (r *groupRepo) GetFullGroup(ctx context.Context, req *pd.GetByIdRequest) (*
 	}
 
 	var (
-		groups          []*pd.Group
-		filter          bson.D
-		groupIds        []string
-		groupsMap       = make(map[string][]*pd.Group)
-		group           *pd.Group
-		groupCollection = r.db.Collection("group")
-		fieldCollection = r.db.Collection("field")
-		key             = "_id"
-		value           interface{}
-		fieldsMap       = make(map[string][]*pd.Field)
+		groups    []*pd.Group
+		filter    bson.D
+		groupIds  []string
+		groupsMap = make(map[string][]*pd.Group)
+		group     *pd.Group
+		key       = "_id"
+		value     interface{}
+		fieldsMap = make(map[string][]*pd.Field)
 	)
 
 	if req.XId == "" {
@@ -457,7 +442,7 @@ func (r *groupRepo) GetFullGroup(ctx context.Context, req *pd.GetByIdRequest) (*
 		},
 	}
 
-	cursor, err := groupCollection.Find(ctx, filter)
+	cursor, err := r.group.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -489,7 +474,7 @@ func (r *groupRepo) GetFullGroup(ctx context.Context, req *pd.GetByIdRequest) (*
 		{Key: "group_id", Value: bson.D{{Key: "$in", Value: groupIds}}},
 	}
 
-	cursor, err = fieldCollection.Find(ctx, filter)
+	cursor, err = r.field.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -516,7 +501,7 @@ func (r *groupRepo) GetFullGroup(ctx context.Context, req *pd.GetByIdRequest) (*
 		return nil, fmt.Errorf("error while converting group to string" + err.Error())
 	}
 
-	r.cache.Set(req.XId, groupString, ttlcache.DefaultTTL)
+	r.cache.Set(req.XId, groupString, time.Hour)
 
 	return group, nil
 }

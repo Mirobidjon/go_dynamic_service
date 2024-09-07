@@ -39,7 +39,9 @@ type GroupI interface {
 type EntityI interface {
 	Create(ctx context.Context, slug string, body map[string]interface{}) error
 	Update(ctx context.Context, slug string, id string, body map[string]interface{}) error
+	UpdateMany(ctx context.Context, slug string, ids []string, body map[string]interface{}) error
 	Delete(ctx context.Context, slug string, id string) error
+	DeleteMany(ctx context.Context, slug string, ids []string) error
 	Get(ctx context.Context, slug string, id string) (map[string]interface{}, error)
 	List(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.D) ([]map[string]interface{}, error)
 	JoinList(ctx context.Context, slug, order, sort string, limit, offset int32, filter bson.A, aggregate *pd.Aggregate) ([]map[string]interface{}, error)

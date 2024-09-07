@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/mirobidjon/go_dynamic_service/config"
 	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
+	"github.com/mirobidjon/go_dynamic_service/models"
 	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
 	"github.com/mirobidjon/go_dynamic_service/storage"
 
@@ -70,8 +72,16 @@ func (s *entityRepo) UpdatePatch(ctx context.Context, entity *pb.Entity) (*pb.En
 
 	body := entity.Data.AsMap()
 
-	if !helper.IsValidObjectId(body["_id"]) {
+	ids := strings.Split(entity.XId, ",")
+	if len(ids) == 0 {
 		return nil, helper.HandleError(s.log, fmt.Errorf("invalid object id"), "error while checking body ", entity, codes.InvalidArgument)
+	}
+
+	for _, id := range ids {
+		if !helper.IsValidObjectId(id) {
+			return nil, helper.HandleError(s.log, fmt.Errorf("invalid object id"), "error while checking body ", entity, codes.InvalidArgument)
+		}
+		entity.XId = id
 	}
 
 	if entity.Slug == "" {
@@ -88,7 +98,12 @@ func (s *entityRepo) UpdatePatch(ctx context.Context, entity *pb.Entity) (*pb.En
 		return nil, helper.HandleError(s.log, err, "error while checking body ", entity, codes.Internal)
 	}
 
-	err = s.stg.Entity().Update(ctx, entity.Slug, entity.XId, body)
+	if len(ids) > 1 {
+		err = s.stg.Entity().UpdateMany(ctx, entity.Slug, ids, body)
+	} else {
+		err = s.stg.Entity().Update(ctx, entity.Slug, entity.XId, body)
+	}
+
 	if err != nil {
 		return nil, helper.HandleError(s.log, err, "error while updating "+entity.Slug, entity, codes.Internal)
 	}
@@ -106,8 +121,16 @@ func (s *entityRepo) Update(ctx context.Context, entity *pb.Entity) (*pb.Entity,
 
 	body := entity.Data.AsMap()
 
-	if !helper.IsValidObjectId(body["_id"]) {
+	ids := strings.Split(entity.XId, ",")
+	if len(ids) == 0 {
 		return nil, helper.HandleError(s.log, fmt.Errorf("invalid object id"), "error while checking body ", entity, codes.InvalidArgument)
+	}
+
+	for _, id := range ids {
+		if !helper.IsValidObjectId(id) {
+			return nil, helper.HandleError(s.log, fmt.Errorf("invalid object id"), "error while checking body ", entity, codes.InvalidArgument)
+		}
+		entity.XId = id
 	}
 
 	if entity.Slug == "" {
@@ -124,7 +147,12 @@ func (s *entityRepo) Update(ctx context.Context, entity *pb.Entity) (*pb.Entity,
 		return nil, helper.HandleError(s.log, err, "error while checking body ", entity, codes.Internal)
 	}
 
-	err = s.stg.Entity().Update(ctx, entity.Slug, entity.XId, body)
+	if len(ids) > 1 {
+		err = s.stg.Entity().UpdateMany(ctx, entity.Slug, ids, body)
+	} else {
+		err = s.stg.Entity().Update(ctx, entity.Slug, entity.XId, body)
+	}
+
 	if err != nil {
 		return nil, helper.HandleError(s.log, err, "error while updating "+entity.Slug, entity, codes.Internal)
 	}
@@ -139,16 +167,30 @@ func (s *entityRepo) Update(ctx context.Context, entity *pb.Entity) (*pb.Entity,
 
 func (s *entityRepo) Delete(ctx context.Context, entity *pb.Entity) (*emptypb.Empty, error) {
 	s.log.Info("Delete", log.Any("req", entity))
+	var err error
 
-	if !helper.IsValidObjectId(entity.XId) {
+	ids := strings.Split(entity.XId, ",")
+	if len(ids) == 0 {
 		return nil, helper.HandleError(s.log, fmt.Errorf("invalid object id"), "error while checking body ", entity, codes.InvalidArgument)
+	}
+
+	for _, id := range ids {
+		if !helper.IsValidObjectId(id) {
+			return nil, helper.HandleError(s.log, fmt.Errorf("invalid object id"), "error while checking body ", entity, codes.InvalidArgument)
+		}
+		entity.XId = id
 	}
 
 	if entity.Slug == "" {
 		return nil, helper.HandleError(s.log, fmt.Errorf("slug is empty"), "error while checking body ", entity, codes.InvalidArgument)
 	}
 
-	err := s.stg.Entity().Delete(ctx, entity.Slug, entity.XId)
+	if len(ids) > 1 {
+		err = s.stg.Entity().DeleteMany(ctx, entity.Slug, ids)
+	} else {
+		err = s.stg.Entity().Delete(ctx, entity.Slug, entity.XId)
+	}
+
 	if err != nil {
 		return nil, helper.HandleError(s.log, err, "error while deleting "+entity.Slug, entity, codes.Internal)
 	}
@@ -167,6 +209,11 @@ func (s *entityRepo) GetById(ctx context.Context, req *pb.GetByPk) (*pb.Entity, 
 		return nil, helper.HandleError(s.log, fmt.Errorf("slug is empty"), "error while checking body ", req, codes.InvalidArgument)
 	}
 
+	group, err := s.stg.Group().GetFullGroup(ctx, &pb.GetByIdRequest{XId: req.Slug})
+	if err != nil {
+		return nil, helper.HandleError(s.log, err, "error while getting group", req, codes.Internal)
+	}
+
 	body, err := s.stg.Entity().Get(ctx, req.Slug, req.XId)
 	if err != nil {
 		return nil, helper.HandleError(s.log, err, "error while getting "+req.Slug, req, codes.Internal)
@@ -176,6 +223,14 @@ func (s *entityRepo) GetById(ctx context.Context, req *pb.GetByPk) (*pb.Entity, 
 		Slug: req.Slug,
 		XId:  req.XId,
 		Data: &structpb.Struct{},
+	}
+
+	for _, field := range group.Fields {
+		if field.FieldType == models.FieldTypeDate || field.FieldType == models.FieldTypeDateTime {
+			if _, ok := body[field.Slug]; ok {
+				body[field.Slug], _ = helper.ToLocationTime(cast.ToString(body[field.Slug]), req.Location)
+			}
+		}
 	}
 
 	body["created_at"], _ = helper.ToLocationTime(cast.ToString(body["created_at"]), req.Location)
@@ -222,6 +277,14 @@ func (s *entityRepo) GetAll(ctx context.Context, req *pb.GetAllRequest) (*pb.Get
 	}
 
 	for _, item := range entities {
+		for _, field := range group.Fields {
+			if field.FieldType == models.FieldTypeDate || field.FieldType == models.FieldTypeDateTime {
+				if _, ok := item[field.Slug]; ok {
+					item[field.Slug], _ = helper.ToLocationTime(cast.ToString(item[field.Slug]), req.Location)
+				}
+			}
+		}
+
 		item["created_at"], _ = helper.ToLocationTime(cast.ToString(item["created_at"]), req.Location)
 		item["updated_at"], _ = helper.ToLocationTime(cast.ToString(item["updated_at"]), req.Location)
 
@@ -276,6 +339,14 @@ func (s *entityRepo) GetJoin(ctx context.Context, req *pb.GetJoinRequest) (*pb.G
 
 		if _, ok := item["updated_at"]; ok {
 			item["updated_at"], _ = helper.ToLocationTime(cast.ToString(item["updated_at"]), req.Location)
+		}
+
+		for _, field := range group.Fields {
+			if field.FieldType == models.FieldTypeDate || field.FieldType == models.FieldTypeDateTime {
+				if _, ok := item[field.Slug]; ok {
+					item[field.Slug], _ = helper.ToLocationTime(cast.ToString(item[field.Slug]), req.Location)
+				}
+			}
 		}
 
 		entity, err := helper.ToProtoStruct(item)
