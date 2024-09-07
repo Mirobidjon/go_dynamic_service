@@ -124,3 +124,7 @@ type AggregationGroup struct {
 	Accumulator string `json:"accumulator"`
 	Expression  string `json:"expression"`
 }
+
+type EntityIdRequest struct {
+	Id string `json:"_id"`
+}

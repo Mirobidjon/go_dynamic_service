@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/mirobidjon/go_dynamic_service/api/http"
 	"github.com/mirobidjon/go_dynamic_service/api/models"
 	"github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
@@ -31,16 +34,7 @@ func (h *Handler) CreateEntity(c *fiber.Ctx) error {
 		return h.handleResponse(c, http.BadRequest, nil, "invalid_slug", "slug is required")
 	}
 
-	var entity = dynamic_service.Entity{
-		Data: &structpb.Struct{},
-	}
-
-	entity.Slug = slug
-	if err := entity.Data.UnmarshalJSON(c.Body()); err != nil {
-		return h.handleResponse(c, http.BadRequest, nil, "unmarshal_entity", err.Error())
-	}
-
-	resp, err := h.services.EntityService().Create(c.Context(), &entity)
+	resp, err := h.createEntity(c, c.Body(), slug)
 	if err != nil {
 		return h.handleResponse(c, http.InternalServerError, nil, "create_entity", err.Error())
 	}
@@ -117,22 +111,7 @@ func (h *Handler) PatchUpdateEntity(c *fiber.Ctx) error {
 		return h.handleResponse(c, http.BadRequest, nil, "invalid_slug", "slug is required")
 	}
 
-	var entity = dynamic_service.Entity{
-		Data: &structpb.Struct{},
-	}
-	entity.Slug = slug
-	entity.XId = c.Params("id")
-	entity.Location = c.Get("location")
-
-	if entity.XId == "" {
-		return h.handleResponse(c, http.BadRequest, nil, "invalid_id", "id is required")
-	}
-
-	if err := entity.Data.UnmarshalJSON(c.Body()); err != nil {
-		return h.handleResponse(c, http.BadRequest, nil, "unmarshal_entity", err.Error())
-	}
-
-	resp, err := h.services.EntityService().UpdatePatch(c.Context(), &entity)
+	resp, err := h.patchUpdateEntity(c, c.Body(), slug, c.Params("id"))
 	if err != nil {
 		return h.handleResponse(c, http.InternalServerError, nil, "update_entity", err.Error())
 	}
@@ -572,4 +551,83 @@ func (h *Handler) GetExampleEntity(c *fiber.Ctx) error {
 	}
 
 	return h.handleResponse(c, http.OK, group, "default_success_message", "")
+}
+
+func (h *Handler) createEntity(c *fiber.Ctx, body any, slug string) (*dynamic_service.Entity, error) {
+	var (
+		err    error
+		entity dynamic_service.Entity
+		resp   *dynamic_service.Entity
+	)
+
+	if slug == "" {
+		return nil, fmt.Errorf("slug is required")
+	}
+
+	entity.Slug = slug
+	entity.Location = c.Get("location")
+
+	switch actualBody := body.(type) {
+	case string:
+		entity.Data, err = helper.StringToStructPb(actualBody)
+	case []byte:
+		entity.Data, err = helper.ByteToStructPb(actualBody)
+	case map[string]interface{}:
+		entity.Data, err = helper.ToProtoStruct(actualBody)
+	case map[string]string:
+		entity.Data, err = helper.ToProtoStruct(actualBody)
+	default:
+		return nil, fmt.Errorf("unsupported body type: %T", actualBody)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err = h.services.EntityService().Create(c.Context(), &entity)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (h *Handler) patchUpdateEntity(c *fiber.Ctx, body any, slug string, xIds ...string) (*dynamic_service.Entity, error) {
+	var (
+		err    error
+		entity dynamic_service.Entity
+		resp   *dynamic_service.Entity
+	)
+
+	if slug == "" {
+		return nil, fmt.Errorf("slug is required")
+	}
+
+	entity.Slug = slug
+	entity.XId = strings.Join(xIds, ",")
+	entity.Location = c.Get("location")
+
+	switch actualBody := body.(type) {
+	case string:
+		entity.Data, err = helper.StringToStructPb(actualBody)
+	case []byte:
+		entity.Data, err = helper.ByteToStructPb(actualBody)
+	case map[string]interface{}:
+		entity.Data, err = helper.ToProtoStruct(actualBody)
+	case map[string]string:
+		entity.Data, err = helper.ToProtoStruct(actualBody)
+	default:
+		return nil, fmt.Errorf("unsupported body type: %T", actualBody)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err = h.services.EntityService().UpdatePatch(c.Context(), &entity)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }

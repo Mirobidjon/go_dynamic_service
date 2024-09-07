@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
-	"github.com/mirobidjon/go_dynamic_service/models"
+	"github.com/mirobidjon/go_dynamic_service/model"
 
 	"github.com/spf13/cast"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,7 +14,7 @@ import (
 func CheckDataForPatch(obj interface{}, group *pb.Group, location *string) error {
 	fieldMap := make(map[string]interface{}, 0)
 
-	if group.GroupType == models.GroupTypeObject {
+	if group.GroupType == model.GroupTypeObject {
 		var data map[string]interface{}
 		switch obj.(type) {
 		case map[string]interface{}:
@@ -51,7 +51,7 @@ func CheckDataForPatch(obj interface{}, group *pb.Group, location *string) error
 				return fmt.Errorf("%s.%s", group.Slug, err.Error())
 			}
 		}
-	} else if group.GroupType == models.GroupTypeArray {
+	} else if group.GroupType == model.GroupTypeArray {
 		var arr []interface{}
 		if reflect.TypeOf(obj).Kind() == reflect.Slice {
 			arr = cast.ToSlice(obj)
@@ -113,7 +113,7 @@ func CheckDataForPatch(obj interface{}, group *pb.Group, location *string) error
 func CheckData(obj interface{}, group *pb.Group, location *string) error {
 	fieldMap := make(map[string]interface{}, 0)
 
-	if group.GroupType == models.GroupTypeObject {
+	if group.GroupType == model.GroupTypeObject {
 		var data map[string]interface{}
 		switch obj.(type) {
 		case map[string]interface{}:
@@ -145,7 +145,7 @@ func CheckData(obj interface{}, group *pb.Group, location *string) error {
 				return fmt.Errorf("%s.%s", group.Slug, err.Error())
 			}
 		}
-	} else if group.GroupType == models.GroupTypeArray {
+	} else if group.GroupType == model.GroupTypeArray {
 		var arr []interface{}
 		if reflect.TypeOf(obj).Kind() == reflect.Slice {
 			arr = cast.ToSlice(obj)
@@ -257,19 +257,19 @@ func CheckOnlyOneField(data map[string]interface{}, v *pb.Field, location *strin
 			}
 		}
 
-		if v.FieldType == models.FieldTypePoint {
+		if v.FieldType == model.FieldTypePoint {
 			if IsValidGeoPoint(data[v.Slug]) {
 				return fmt.Errorf("%s is not valid (point)", field)
 			}
 		}
 
-		if v.FieldType == models.FieldTypePolygon {
+		if v.FieldType == model.FieldTypePolygon {
 			if IsValidGeoPolygon(data[v.Slug]) {
 				return fmt.Errorf("%s is not valid (polygon)", field)
 			}
 		}
 
-		if v.FieldType == models.FieldTypeNumber {
+		if v.FieldType == model.FieldTypeNumber {
 			num := cast.ToInt32(data[v.Slug])
 
 			if v.Max != 0 || v.Min != 0 {
@@ -279,7 +279,7 @@ func CheckOnlyOneField(data map[string]interface{}, v *pb.Field, location *strin
 			}
 		}
 
-		if v.FieldType == models.FieldTypeFloat {
+		if v.FieldType == model.FieldTypeFloat {
 			num := cast.ToFloat64(data[v.Slug])
 
 			if v.Max != 0 || v.Min != 0 {
@@ -289,7 +289,7 @@ func CheckOnlyOneField(data map[string]interface{}, v *pb.Field, location *strin
 			}
 		}
 
-		if v.FieldType == models.FieldTypeText {
+		if v.FieldType == model.FieldTypeText {
 			val := cast.ToString(data[v.Slug])
 
 			if v.Max != 0 || v.Min != 0 {
@@ -316,7 +316,7 @@ func CheckOnlyOneField(data map[string]interface{}, v *pb.Field, location *strin
 		}
 	}
 
-	if v.FieldType == models.FieldTypeObjectID {
+	if v.FieldType == model.FieldTypeObjectID {
 		data[v.Slug], err = ToObjectID(data[v.Slug])
 		if err != nil {
 			return fmt.Errorf("%s is not valid", field)
@@ -336,41 +336,41 @@ func GetDefaultValue(fieldType, location *string, defaultValue string) interface
 	}
 
 	switch *fieldType {
-	case models.FieldTypeNumber:
+	case model.FieldTypeNumber:
 		return number
 
-	case models.FieldTypeFloat:
+	case model.FieldTypeFloat:
 		return numberFloat
 
-	case models.FieldTypeText:
+	case model.FieldTypeText:
 		return defaultValue
 
-	case models.FieldTypeBool:
+	case model.FieldTypeBool:
 		return boolean
 
-	case models.FieldTypeDate:
+	case model.FieldTypeDate:
 		if defaultValue == "TIME_NOW" {
 			return DateNowWithLocation(*location)
 		}
 		return defaultValue
 
-	case models.FieldTypeDateTime:
+	case model.FieldTypeDateTime:
 		if defaultValue == "TIME_NOW" {
 			return TimeNowWithLocation(*location)
 		}
 		return defaultValue
 
-	case models.FieldTypeRadio, models.FieldTypeSelect, models.FieldTypeFile:
+	case model.FieldTypeRadio, model.FieldTypeSelect, model.FieldTypeFile:
 		return defaultValue
 
-	case models.FieldTypeObjectID:
+	case model.FieldTypeObjectID:
 		if defaultValue == "GENERATE" {
 			return GenerateID()
 		}
 
 		return defaultValue
 
-	case models.FieldTypeUuid:
+	case model.FieldTypeUuid:
 		if defaultValue == "GENERATE" {
 			return GenerateUUID()
 		}
@@ -384,25 +384,25 @@ func GetDefaultValue(fieldType, location *string, defaultValue string) interface
 
 func EmptyValue(filedType *string) interface{} {
 	switch *filedType {
-	case models.FieldTypeNumber, models.FieldTypeFloat:
+	case model.FieldTypeNumber, model.FieldTypeFloat:
 		return 0
 
-	case models.FieldTypeText:
+	case model.FieldTypeText:
 		return ""
 
-	case models.FieldTypeBool:
+	case model.FieldTypeBool:
 		return false
 
-	case models.FieldTypeDate:
+	case model.FieldTypeDate:
 		return ""
 
-	case models.FieldTypeDateTime:
+	case model.FieldTypeDateTime:
 		return ""
 
-	case models.FieldTypeObjectID, models.FieldTypeUuid:
+	case model.FieldTypeObjectID, model.FieldTypeUuid:
 		return ""
 
-	case models.FieldTypeRadio, models.FieldTypeSelect, models.FieldTypeFile:
+	case model.FieldTypeRadio, model.FieldTypeSelect, model.FieldTypeFile:
 		return ""
 
 	default:

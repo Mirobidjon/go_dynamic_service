@@ -84,6 +84,10 @@ func ProtoToString(m protoreflect.ProtoMessage) (string, error) {
 }
 
 func ToProtoStruct(body interface{}) (entity *structpb.Struct, err error) {
+	if body == nil {
+		return nil, nil
+	}
+
 	entity = &structpb.Struct{}
 	js, err := json.Marshal(body)
 	if err != nil {
@@ -94,10 +98,38 @@ func ToProtoStruct(body interface{}) (entity *structpb.Struct, err error) {
 	return
 }
 
-func StringToStructPb(js string) (entity *structpb.Struct, err error) {
-	entity = &structpb.Struct{}
-	err = entity.UnmarshalJSON([]byte(js))
-	return
+func ByteToStructPb(data []byte) (*structpb.Struct, error) {
+	if data == nil {
+		return nil, nil
+	}
+
+	structInfo := &structpb.Struct{}
+	err := structInfo.UnmarshalJSON(data)
+	return structInfo, err
+}
+
+func StringToStructPb(data string) (*structpb.Struct, error) {
+	if data == "" {
+		return nil, nil
+	}
+
+	structInfo := &structpb.Struct{}
+	err := structInfo.UnmarshalJSON([]byte(data))
+	return structInfo, err
+}
+
+func MarshalToStruct(data interface{}, resp interface{}) error {
+	js, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(js, resp)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func StructPbToString(entity *structpb.Struct) (string, error) {

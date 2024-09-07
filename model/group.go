@@ -1,4 +1,4 @@
-package models
+package model
 
 const (
 	FieldTypeNumber   = "number"

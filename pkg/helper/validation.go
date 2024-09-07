@@ -9,7 +9,7 @@ import (
 
 	"github.com/mirobidjon/go_dynamic_service/config"
 	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
-	"github.com/mirobidjon/go_dynamic_service/models"
+	"github.com/mirobidjon/go_dynamic_service/model"
 
 	"github.com/google/uuid"
 	"github.com/spf13/cast"
@@ -66,7 +66,7 @@ func RegexValidate(regex string, value interface{}) bool {
 func CheckValidationFunc(funcName string, value interface{}, valueType string) bool {
 	switch value.(type) {
 	case int, int32, int64, uint, uint32, uint64:
-		if valueType != models.FieldTypeNumber {
+		if valueType != model.FieldTypeNumber {
 			return false
 		}
 
@@ -74,20 +74,20 @@ func CheckValidationFunc(funcName string, value interface{}, valueType string) b
 			return false
 		}
 	case string:
-		if valueType != models.FieldTypeText && valueType != models.FieldTypeDate &&
-			valueType != models.FieldTypeDateTime && valueType != models.FieldTypeSelect &&
-			valueType != models.FieldTypeRadio && valueType != models.FieldTypeObjectID &&
-			valueType != models.FieldTypeUuid {
+		if valueType != model.FieldTypeText && valueType != model.FieldTypeDate &&
+			valueType != model.FieldTypeDateTime && valueType != model.FieldTypeSelect &&
+			valueType != model.FieldTypeRadio && valueType != model.FieldTypeObjectID &&
+			valueType != model.FieldTypeUuid {
 			return false
 		}
 
 	case primitive.ObjectID:
-		if valueType != models.FieldTypeObjectID {
+		if valueType != model.FieldTypeObjectID {
 			return false
 		}
 
 	case uuid.UUID:
-		if valueType != models.FieldTypeUuid {
+		if valueType != model.FieldTypeUuid {
 			return false
 		}
 
@@ -189,7 +189,7 @@ func IsValidGeoPoint(value any) bool {
 		return false
 	}
 
-	var point models.GeoPoint
+	var point model.GeoPoint
 	if err := json.Unmarshal(valueStr, &point); err != nil {
 		return false
 	}
@@ -211,7 +211,7 @@ func IsValidGeoPolygon(value any) bool {
 		return false
 	}
 
-	var polygon models.GeoPolygon
+	var polygon model.GeoPolygon
 	if err := json.Unmarshal(valueStr, &polygon); err != nil {
 		return false
 	}
