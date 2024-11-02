@@ -7,7 +7,7 @@ import (
 
 	"github.com/mirobidjon/go_dynamic_service/config"
 	pb "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
-	"github.com/mirobidjon/go_dynamic_service/models"
+	"github.com/mirobidjon/go_dynamic_service/model"
 	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
 	"github.com/mirobidjon/go_dynamic_service/storage"
 
@@ -226,7 +226,7 @@ func (s *entityRepo) GetById(ctx context.Context, req *pb.GetByPk) (*pb.Entity, 
 	}
 
 	for _, field := range group.Fields {
-		if field.FieldType == models.FieldTypeDate || field.FieldType == models.FieldTypeDateTime {
+		if field.FieldType == model.FieldTypeDate || field.FieldType == model.FieldTypeDateTime {
 			if _, ok := body[field.Slug]; ok {
 				body[field.Slug], _ = helper.ToLocationTime(cast.ToString(body[field.Slug]), req.Location)
 			}
@@ -278,7 +278,7 @@ func (s *entityRepo) GetAll(ctx context.Context, req *pb.GetAllRequest) (*pb.Get
 
 	for _, item := range entities {
 		for _, field := range group.Fields {
-			if field.FieldType == models.FieldTypeDate || field.FieldType == models.FieldTypeDateTime {
+			if field.FieldType == model.FieldTypeDate || field.FieldType == model.FieldTypeDateTime {
 				if _, ok := item[field.Slug]; ok {
 					item[field.Slug], _ = helper.ToLocationTime(cast.ToString(item[field.Slug]), req.Location)
 				}
@@ -342,7 +342,7 @@ func (s *entityRepo) GetJoin(ctx context.Context, req *pb.GetJoinRequest) (*pb.G
 		}
 
 		for _, field := range group.Fields {
-			if field.FieldType == models.FieldTypeDate || field.FieldType == models.FieldTypeDateTime {
+			if field.FieldType == model.FieldTypeDate || field.FieldType == model.FieldTypeDateTime {
 				if _, ok := item[field.Slug]; ok {
 					item[field.Slug], _ = helper.ToLocationTime(cast.ToString(item[field.Slug]), req.Location)
 				}

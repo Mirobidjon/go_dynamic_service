@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	pd "github.com/mirobidjon/go_dynamic_service/genproto/dynamic_service"
-	"github.com/mirobidjon/go_dynamic_service/models"
+	"github.com/mirobidjon/go_dynamic_service/model"
 	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
 	"github.com/mirobidjon/go_dynamic_service/storage"
 
@@ -421,7 +421,40 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 			continue
 		}
 
-		if f.IsSearchable == 1 && f.FieldType != models.FieldTypeNumber && f.FieldType != models.FieldTypeFloat {
+		if val == "not_null" {
+			filter = append(filter, bson.M{
+				"$match": bson.M{
+					slugStr: bson.M{
+						"$ne": primitive.Null{},
+					},
+				},
+			})
+			continue
+		}
+
+		if f.FieldType == model.FieldTypeNumber || f.FieldType == model.FieldTypeFloat {
+			numberVal, ok := val.(model.Pair)
+			if ok {
+				// TODO: add validation to the key
+				// if !helper.Check
+				filter = append(filter, bson.M{
+					"$match": bson.M{
+						slugStr: bson.M{
+							numberVal.Operator: numberVal.Value,
+						},
+					},
+				})
+			}
+
+			filter = append(filter, bson.M{
+				"$match": bson.M{
+					slugStr: val,
+				},
+			})
+			continue
+		}
+
+		if f.IsSearchable == 1 || cast.ToString(val) == "on_search" {
 			if cast.ToString(val) == "on_search" {
 				filter = append(filter, bson.M{
 					"$match": bson.M{
@@ -445,7 +478,7 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 		}
 
 		if f.IsSearchable == 2 {
-			if f.FieldType == models.FieldTypeDate || f.FieldType == models.FieldTypeDateTime {
+			if f.FieldType == model.FieldTypeDate || f.FieldType == model.FieldTypeDateTime {
 				val, _ = helper.ToUTC(cast.ToString(val), location)
 
 				filter = append(filter, bson.M{
@@ -480,7 +513,7 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 				continue
 			}
 
-			if f.FieldType == models.FieldTypeObjectID {
+			if f.FieldType == model.FieldTypeObjectID {
 				objIds := strings.Split(cast.ToString(val), ",")
 				var objIdsHex []primitive.ObjectID
 
@@ -518,28 +551,6 @@ func makeJoinQueryFilter(req map[string]interface{}, group *pd.Group, filter bso
 
 			continue
 		}
-
-		if f.FieldType == models.FieldTypeNumber || f.FieldType == models.FieldTypeFloat {
-			numberVal, ok := val.(models.Pair)
-			if ok {
-				// TODO: add validation to the key
-				// if !helper.Check
-				filter = append(filter, bson.M{
-					"$match": bson.M{
-						slugStr: bson.M{
-							numberVal.Operator: numberVal.Value,
-						},
-					},
-				})
-			}
-
-			filter = append(filter, bson.M{
-				"$match": bson.M{
-					slugStr: val,
-				},
-			})
-			continue
-		}
 	}
 
 	for _, gr := range group.Children {
@@ -575,7 +586,24 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 			continue
 		}
 
-		if f.IsSearchable == 1 {
+		if val == "not_null" {
+			filter = append(filter, bson.E{Key: slugStr, Value: bson.M{"$ne": primitive.Null{}}})
+			continue
+		}
+
+		if f.FieldType == model.FieldTypeNumber || f.FieldType == model.FieldTypeFloat {
+			numberVal, ok := val.(model.Pair)
+			if ok {
+				// TODO: add validation to the key
+				// if !helper.Check
+				filter = append(filter, bson.E{Key: slugStr, Value: bson.D{{Key: numberVal.Operator, Value: numberVal.Value}}})
+			}
+
+			filter = append(filter, bson.E{Key: slugStr, Value: val})
+			continue
+		}
+
+		if f.IsSearchable == 1 || cast.ToString(val) == "on_search" {
 			if cast.ToString(val) == "on_search" {
 				filter = append(filter, bson.E{Key: slugStr, Value: primitive.Regex{Pattern: search, Options: "i"}})
 			} else {
@@ -585,7 +613,7 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 		}
 
 		if f.IsSearchable == 2 {
-			if f.FieldType == models.FieldTypeDate || f.FieldType == models.FieldTypeDateTime {
+			if f.FieldType == model.FieldTypeDate || f.FieldType == model.FieldTypeDateTime {
 				val, _ = helper.ToUTC(cast.ToString(val), location)
 
 				filter = append(filter, bson.E{Key: slugStr, Value: val})
@@ -610,7 +638,7 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 				continue
 			}
 
-			if f.FieldType == models.FieldTypeObjectID {
+			if f.FieldType == model.FieldTypeObjectID {
 				objIds := strings.Split(cast.ToString(val), ",")
 				var objIdsHex []primitive.ObjectID
 
@@ -629,7 +657,7 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 				continue
 			}
 
-			if f.FieldType == models.FieldTypeUuid {
+			if f.FieldType == model.FieldTypeUuid {
 				uuids := strings.Split(cast.ToString(val), ",")
 				filter = append(filter, bson.E{Key: slugStr, Value: bson.D{{Key: "$in", Value: uuids}}})
 				continue
@@ -640,18 +668,6 @@ func makeQueryFilter(req map[string]interface{}, group *pd.Group, filter bson.D,
 
 		if f.IsSearchable == 3 {
 			// check only equal
-			filter = append(filter, bson.E{Key: slugStr, Value: val})
-			continue
-		}
-
-		if f.FieldType == models.FieldTypeNumber || f.FieldType == models.FieldTypeFloat {
-			numberVal, ok := val.(models.Pair)
-			if ok {
-				// TODO: add validation to the key
-				// if !helper.Check
-				filter = append(filter, bson.E{Key: slugStr, Value: bson.D{{Key: numberVal.Operator, Value: numberVal.Value}}})
-			}
-
 			filter = append(filter, bson.E{Key: slugStr, Value: val})
 			continue
 		}

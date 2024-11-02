@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/mirobidjon/go_dynamic_service/config"
-	"github.com/mirobidjon/go_dynamic_service/models"
+	"github.com/mirobidjon/go_dynamic_service/model"
 	"github.com/mirobidjon/go_dynamic_service/pkg/helper"
 	"github.com/mirobidjon/go_dynamic_service/storage"
 
@@ -139,7 +139,7 @@ func (s *groupService) CreateField(ctx context.Context, req *pb.Field) (*pb.Fiel
 		return nil, helper.HandleError(s.log, err, "Error while getting group by id ", req, codes.Internal)
 	}
 
-	if req.Slug == "_id" && req.FieldType != models.FieldTypeObjectID {
+	if req.Slug == "_id" && req.FieldType != model.FieldTypeObjectID {
 		return nil, helper.HandleError(s.log, nil, "Slug _id is reserved", req, codes.InvalidArgument)
 	}
 
@@ -180,7 +180,7 @@ func (s *groupService) UpdateField(ctx context.Context, req *pb.Field) (*pb.Fiel
 		return nil, helper.HandleError(s.log, err, "Error while getting group by id ", req, codes.Internal)
 	}
 
-	if req.Slug == "_id" && req.FieldType != models.FieldTypeObjectID {
+	if req.Slug == "_id" && req.FieldType != model.FieldTypeObjectID {
 		return nil, helper.HandleError(s.log, nil, "Slug _id is reserved", req, codes.InvalidArgument)
 	}
 
